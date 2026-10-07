@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras Básico</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Mi Tienda Web</h1>
+        <button id="btn-theme">Modo Oscuro</button>
+    </header>
+
+    <main>
+        <section class="productos">
+            <h2>Productos</h2>
+            <div class="grid-productos">
+                <!-- Producto 1 -->
+                <div class="producto">
+                    <h3>Producto A</h3>
+                    <p>Precio: $10</p>
+                    <button class="btn-agregar" data-id="1" data-nombre="Producto A" data-precio="10">Agregar al Carrito</button>
+                </div>
+                <!-- Producto 2 -->
+                <div class="producto">
+                    <h3>Producto B</h3>
+                    <p>Precio: $20</p>
+                    <button class="btn-agregar" data-id="2" data-nombre="Producto B" data-precio="20">Agregar al Carrito</button>
+                </div>
+                <!-- Producto 3 -->
+                <div class="producto">
+                    <h3>Producto C</h3>
+                    <p>Precio: $30</p>
+                    <button class="btn-agregar" data-id="3" data-nombre="Producto C" data-precio="30">Agregar al Carrito</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="carrito">
+            <h2>Carrito de Compras</h2>
+            <div id="lista-carrito">
+                <!-- Aquí se renderizarán los productos -->
+            </div>
+            <div class="carrito-footer">
+                <p>Total: $<span id="total-carrito">0</span></p>
+                <button id="btn-vaciar">Vaciar Carrito</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
