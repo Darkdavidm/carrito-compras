@@ -4,15 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Tienda Web - Carrito y Usuarios</title>
-    <link rel="stylesheet" href="css/style.css">
+    <!-- Agregamos parámetro de versión para evitar caché en navegadores -->
+    <link rel="stylesheet" href="css/style.css?v=2">
 </head>
 <body>
     <header>
-        <h1>Mi Tienda Web</h1>
+        <div class="brand">
+            <h1>Mi Tienda Web</h1>
+        </div>
+        
+        <!-- Información del usuario logueado -->
+        <div id="user-header-info" class="user-header-info oculto">
+            <div class="user-text">
+                <span class="user-saludo">Bienvenido, <strong id="user-name"></strong></span>
+                <span class="user-datos" id="user-datos"></span>
+            </div>
+            <button id="btn-logout" class="btn-logout">Cerrar Sesión</button>
+        </div>
+
         <div class="header-acciones">
-            <span id="user-info" class="oculto">Hola, <strong id="user-name"></strong> 👋</span>
             <button id="btn-theme">Modo Oscuro</button>
-            <button id="btn-logout" class="oculto">Cerrar Sesión</button>
         </div>
     </header>
 
@@ -22,6 +33,7 @@
     <section id="seccion-auth" class="auth-container">
         <div class="auth-card">
             <h2>Acceso a la Tienda</h2>
+            
             <div class="auth-tabs">
                 <button id="tab-login" class="tab-btn activo">Iniciar Sesión</button>
                 <button id="tab-registro" class="tab-btn">Registrarse</button>
@@ -29,6 +41,12 @@
 
             <!-- Formulario de Iniciar Sesión -->
             <form id="form-login" class="auth-form">
+                <div class="demo-box">
+                    <p><strong>👤 Usuario Demo Registrado:</strong></p>
+                    <p>Email: <code>jdcontrerast@gmail.com</code> | Clave: <code>123</code></p>
+                    <button type="button" id="btn-autofill" class="btn-demo">Rellenar datos de Jesús Contreras</button>
+                </div>
+
                 <div class="form-grupo">
                     <label for="login-email">Correo Electrónico:</label>
                     <input type="email" id="login-email" placeholder="tu@correo.com" required>
@@ -40,21 +58,29 @@
                 <button type="submit" class="btn-primary">Ingresar a la Tienda</button>
             </form>
 
-            <!-- Formulario de Registro de Usuario -->
+            <!-- Formulario de Registro de Usuario / Cliente -->
             <form id="form-registro" class="auth-form oculto">
                 <div class="form-grupo">
                     <label for="reg-nombre">Nombre Completo:</label>
-                    <input type="text" id="reg-nombre" placeholder="Ej. Juan Pérez" required>
+                    <input type="text" id="reg-nombre" placeholder="Ej. Jesús Contreras" required>
+                </div>
+                <div class="form-grupo">
+                    <label for="reg-telefono">Teléfono / Celular:</label>
+                    <input type="tel" id="reg-telefono" placeholder="Ej. 3028348399" required>
+                </div>
+                <div class="form-grupo">
+                    <label for="reg-direccion">Dirección:</label>
+                    <input type="text" id="reg-direccion" placeholder="Ej. Avenida falsa 123" required>
                 </div>
                 <div class="form-grupo">
                     <label for="reg-email">Correo Electrónico:</label>
-                    <input type="email" id="reg-email" placeholder="tu@correo.com" required>
+                    <input type="email" id="reg-email" placeholder="Ej. jdcontrerast@gmail.com" required>
                 </div>
                 <div class="form-grupo">
                     <label for="reg-password">Contraseña:</label>
                     <input type="password" id="reg-password" placeholder="Crea una contraseña" required>
                 </div>
-                <button type="submit" class="btn-primary">Crear Cuenta</button>
+                <button type="submit" class="btn-primary">Crear Cuenta y Registrarse</button>
             </form>
 
             <div id="auth-mensaje"></div>
@@ -100,6 +126,6 @@
         </section>
     </main>
 
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=2"></script>
 </body>
 </html>

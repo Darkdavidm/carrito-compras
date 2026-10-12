@@ -11,13 +11,13 @@ btnTheme.addEventListener('click', () => {
 
 
 // ==============================================================
-// 2. SISTEMA DE AUTENTICACIÓN Y USUARIOS
+// 2. SISTEMA DE AUTENTICACIÓN Y CLIENTES / USUARIOS
 // ==============================================================
-// Elementos de la interfaz
 const seccionAuth = document.getElementById('seccion-auth');
 const seccionTienda = document.getElementById('seccion-tienda');
-const userInfo = document.getElementById('user-info');
+const userHeaderInfo = document.getElementById('user-header-info');
 const userName = document.getElementById('user-name');
+const userDatos = document.getElementById('user-datos');
 const btnLogout = document.getElementById('btn-logout');
 
 const tabLogin = document.getElementById('tab-login');
@@ -25,11 +25,45 @@ const tabRegistro = document.getElementById('tab-registro');
 const formLogin = document.getElementById('form-login');
 const formRegistro = document.getElementById('form-registro');
 const authMensaje = document.getElementById('auth-mensaje');
+const btnAutofill = document.getElementById('btn-autofill');
 
-// Almacenamiento en LocalStorage
-// Estructura de cada usuario: { id, nombre, email, password, carrito: [] }
+// Usuario de Ejemplo solicitado (Jesús Contreras)
+const usuarioDefault = {
+    id: 1,
+    nombre: "Jesús Contreras",
+    telefono: "3028348399",
+    email: "jdcontrerast@gmail.com",
+    direccion: "Avenida falsa 123",
+    password: "123",
+    carrito: [
+        { id: "1", nombre: "Producto A", precio: 10 }
+    ]
+};
+
+// Cargar usuarios de localStorage
 let usuarios = JSON.parse(localStorage.getItem('tienda_usuarios')) || [];
+
+// Asegurarse de que el usuario de ejemplo Jesús Contreras siempre exista
+const existeJesus = usuarios.find(u => u.email === usuarioDefault.email);
+if (!existeJesus) {
+    usuarios.unshift(usuarioDefault);
+    localStorage.setItem('tienda_usuarios', JSON.stringify(usuarios));
+} else {
+    // Si ya existe pero le faltan teléfono o dirección, actualizarlos
+    if (!existeJesus.telefono) existeJesus.telefono = usuarioDefault.telefono;
+    if (!existeJesus.direccion) existeJesus.direccion = usuarioDefault.direccion;
+    localStorage.setItem('tienda_usuarios', JSON.stringify(usuarios));
+}
+
 let usuarioActivo = JSON.parse(localStorage.getItem('tienda_usuario_activo')) || null;
+
+// Botón de rellenar credenciales de Jesús Contreras para pruebas rápidas
+if (btnAutofill) {
+    btnAutofill.addEventListener('click', () => {
+        document.getElementById('login-email').value = usuarioDefault.email;
+        document.getElementById('login-password').value = usuarioDefault.password;
+    });
+}
 
 // Alternar entre pestañas de Login y Registro
 tabLogin.addEventListener('click', () => {
@@ -53,20 +87,22 @@ formRegistro.addEventListener('submit', (e) => {
     e.preventDefault();
 
     const nombre = document.getElementById('reg-nombre').value.trim();
+    const telefono = document.getElementById('reg-telefono').value.trim();
+    const direccion = document.getElementById('reg-direccion').value.trim();
     const email = document.getElementById('reg-email').value.trim().toLowerCase();
     const password = document.getElementById('reg-password').value;
 
-    // Verificar si el correo ya está registrado
     const usuarioExistente = usuarios.find(u => u.email === email);
     if (usuarioExistente) {
         mostrarMensaje('Este correo ya está registrado. Inicia sesión.', 'error');
         return;
     }
 
-    // Crear nuevo usuario con su carrito personal vacío
     const nuevoUsuario = {
         id: Date.now(),
         nombre: nombre,
+        telefono: telefono,
+        direccion: direccion,
         email: email,
         password: password,
         carrito: []
@@ -75,13 +111,13 @@ formRegistro.addEventListener('submit', (e) => {
     usuarios.push(nuevoUsuario);
     guardarUsuarios();
 
-    mostrarMensaje('¡Cuenta creada con éxito! Ahora puedes iniciar sesión.', 'exito');
+    mostrarMensaje('¡Cuenta creada con éxito! Ya puedes iniciar sesión.', 'exito');
     formRegistro.reset();
 
-    // Cambiar a la pestaña de login automáticamente
     setTimeout(() => {
         tabLogin.click();
-    }, 1500);
+        document.getElementById('login-email').value = email;
+    }, 1200);
 });
 
 // Evento: Iniciar sesión
@@ -91,7 +127,6 @@ formLogin.addEventListener('submit', (e) => {
     const email = document.getElementById('login-email').value.trim().toLowerCase();
     const password = document.getElementById('login-password').value;
 
-    // Buscar coincidencia de credenciales
     const usuarioEncontrado = usuarios.find(u => u.email === email && u.password === password);
 
     if (!usuarioEncontrado) {
@@ -99,7 +134,6 @@ formLogin.addEventListener('submit', (e) => {
         return;
     }
 
-    // Iniciar sesión
     iniciarSesion(usuarioEncontrado);
 });
 
@@ -108,17 +142,18 @@ function iniciarSesion(usuario) {
     usuarioActivo = usuario;
     localStorage.setItem('tienda_usuario_activo', JSON.stringify(usuarioActivo));
 
-    // Cambiar de pantalla: ocultar login, mostrar tienda
+    // Cambiar vista: ocultar login, mostrar tienda
     seccionAuth.classList.add('oculto');
     seccionTienda.classList.remove('oculto');
-    userInfo.classList.remove('oculto');
-    btnLogout.classList.remove('oculto');
+    userHeaderInfo.classList.remove('oculto');
+
     userName.textContent = usuarioActivo.nombre;
+    userDatos.textContent = `📞 ${usuarioActivo.telefono || 'Sin teléfono'} | 📧 ${usuarioActivo.email} | 📍 ${usuarioActivo.direccion || 'Sin dirección'}`;
 
     limpiarMensaje();
     formLogin.reset();
 
-    // Renderizar el carrito personal de este usuario
+    // Renderizar el carrito exclusivo de este usuario
     renderizarCarrito();
 }
 
@@ -127,10 +162,8 @@ btnLogout.addEventListener('click', () => {
     usuarioActivo = null;
     localStorage.removeItem('tienda_usuario_activo');
 
-    // Volver a la pantalla de login
     seccionTienda.classList.add('oculto');
-    userInfo.classList.add('oculto');
-    btnLogout.classList.add('oculto');
+    userHeaderInfo.classList.add('oculto');
     seccionAuth.classList.remove('oculto');
 
     tabLogin.click();
@@ -158,7 +191,6 @@ const listaCarrito = document.getElementById('lista-carrito');
 const contenedorTotal = document.getElementById('total-carrito');
 const btnVaciar = document.getElementById('btn-vaciar');
 
-// Capturar botones de "Agregar al Carrito"
 const botonesAgregar = document.querySelectorAll('.btn-agregar');
 botonesAgregar.forEach(boton => {
     boton.addEventListener('click', agregarAlCarrito);
@@ -175,13 +207,11 @@ function agregarAlCarrito(e) {
 
     const producto = { id, nombre, precio };
 
-    // Agregar al carrito exclusivo del usuario activo
     if (!usuarioActivo.carrito) {
         usuarioActivo.carrito = [];
     }
     usuarioActivo.carrito.push(producto);
 
-    // Guardar cambios en el almacenamiento persistente
     sincronizarUsuarioActivo();
     renderizarCarrito();
 }
@@ -234,7 +264,6 @@ btnVaciar.addEventListener('click', () => {
     renderizarCarrito();
 });
 
-// Guardar los cambios del usuario activo en la lista general de usuarios
 function sincronizarUsuarioActivo() {
     localStorage.setItem('tienda_usuario_activo', JSON.stringify(usuarioActivo));
     const index = usuarios.findIndex(u => u.id === usuarioActivo.id);
@@ -246,7 +275,7 @@ function sincronizarUsuarioActivo() {
 
 
 // ==============================================================
-// 4. INICIALIZACIÓN: COMPROBAR SI YA HABÍA SESIÓN INICIADA
+// 4. INICIALIZACIÓN: COMPROBAR SESIÓN ACTIVA PREVIA
 // ==============================================================
 if (usuarioActivo) {
     iniciarSesion(usuarioActivo);
