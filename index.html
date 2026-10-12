@@ -3,63 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrito de Compras y Registro de Clientes</title>
+    <title>Mi Tienda Web - Carrito y Usuarios</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <header>
         <h1>Mi Tienda Web</h1>
-        <button id="btn-theme">Modo Oscuro</button>
+        <div class="header-acciones">
+            <span id="user-info" class="oculto">Hola, <strong id="user-name"></strong> 👋</span>
+            <button id="btn-theme">Modo Oscuro</button>
+            <button id="btn-logout" class="oculto">Cerrar Sesión</button>
+        </div>
     </header>
 
-    <main>
-        <!-- Módulo de Registro de Clientes / Usuarios -->
-        <section class="registro-seccion">
-            <h2>Registro de Clientes</h2>
-            <form id="form-registro">
+    <!-- ==============================================
+         PANTALLA DE ACCESO (LOGIN Y REGISTRO)
+         ============================================== -->
+    <section id="seccion-auth" class="auth-container">
+        <div class="auth-card">
+            <h2>Acceso a la Tienda</h2>
+            <div class="auth-tabs">
+                <button id="tab-login" class="tab-btn activo">Iniciar Sesión</button>
+                <button id="tab-registro" class="tab-btn">Registrarse</button>
+            </div>
+
+            <!-- Formulario de Iniciar Sesión -->
+            <form id="form-login" class="auth-form">
+                <div class="form-grupo">
+                    <label for="login-email">Correo Electrónico:</label>
+                    <input type="email" id="login-email" placeholder="tu@correo.com" required>
+                </div>
+                <div class="form-grupo">
+                    <label for="login-password">Contraseña:</label>
+                    <input type="password" id="login-password" placeholder="Tu contraseña" required>
+                </div>
+                <button type="submit" class="btn-primary">Ingresar a la Tienda</button>
+            </form>
+
+            <!-- Formulario de Registro de Usuario -->
+            <form id="form-registro" class="auth-form oculto">
                 <div class="form-grupo">
                     <label for="reg-nombre">Nombre Completo:</label>
                     <input type="text" id="reg-nombre" placeholder="Ej. Juan Pérez" required>
                 </div>
                 <div class="form-grupo">
                     <label for="reg-email">Correo Electrónico:</label>
-                    <input type="email" id="reg-email" placeholder="Ej. juan@correo.com" required>
+                    <input type="email" id="reg-email" placeholder="tu@correo.com" required>
                 </div>
                 <div class="form-grupo">
-                    <label for="reg-telefono">Teléfono / Celular:</label>
-                    <input type="tel" id="reg-telefono" placeholder="Ej. 3001234567" required>
+                    <label for="reg-password">Contraseña:</label>
+                    <input type="password" id="reg-password" placeholder="Crea una contraseña" required>
                 </div>
-                <div class="form-grupo">
-                    <label for="reg-direccion">Dirección:</label>
-                    <input type="text" id="reg-direccion" placeholder="Ej. Calle 10 # 20 - 30" required>
-                </div>
-                <button type="submit" id="btn-registrar">Registrar Cliente</button>
+                <button type="submit" class="btn-primary">Crear Cuenta</button>
             </form>
-            <div id="mensaje-registro"></div>
 
-            <h3>Clientes Registrados</h3>
-            <div id="lista-clientes">
-                <!-- Se renderizan los clientes dinámicamente con JS -->
-            </div>
-        </section>
+            <div id="auth-mensaje"></div>
+        </div>
+    </section>
 
-        <!-- Módulo de Productos -->
+    <!-- ==============================================
+         PANTALLA PRINCIPAL DE LA TIENDA (Solo con sesión)
+         ============================================== -->
+    <main id="seccion-tienda" class="oculto">
+        <!-- Catálogo de Productos -->
         <section class="productos">
-            <h2>Productos</h2>
+            <h2>Productos Disponibles</h2>
             <div class="grid-productos">
-                <!-- Producto 1 -->
                 <div class="producto">
                     <h3>Producto A</h3>
                     <p>Precio: $10</p>
                     <button class="btn-agregar" data-id="1" data-nombre="Producto A" data-precio="10">Agregar al Carrito</button>
                 </div>
-                <!-- Producto 2 -->
                 <div class="producto">
                     <h3>Producto B</h3>
                     <p>Precio: $20</p>
                     <button class="btn-agregar" data-id="2" data-nombre="Producto B" data-precio="20">Agregar al Carrito</button>
                 </div>
-                <!-- Producto 3 -->
                 <div class="producto">
                     <h3>Producto C</h3>
                     <p>Precio: $30</p>
@@ -68,10 +87,11 @@
             </div>
         </section>
 
-        <!-- Módulo de Carrito de Compras -->
+        <!-- Carrito de Compras Personalizado -->
         <section class="carrito">
-            <h2>Carrito de Compras</h2>
-            <div id="lista-carrito">                
+            <h2>Mi Carrito</h2>
+            <div id="lista-carrito">
+                <!-- Se renderizan los productos de este usuario -->
             </div>
             <div class="carrito-footer">
                 <p>Total: $<span id="total-carrito">0</span></p>

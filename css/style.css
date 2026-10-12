@@ -3,30 +3,40 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f9f9f9;
+    background-color: #f4f6f9;
     color: #333;
     transition: background-color 0.3s, color 0.3s;
+    min-height: 100vh;
+}
+
+.oculto {
+    display: none !important;
 }
 
 header {
     background-color: #007bff;
     color: white;
-    padding: 1rem;
+    padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
-main {
+.header-acciones {
     display: flex;
-    flex-wrap: wrap;
-    padding: 2rem;
-    gap: 2rem;
+    align-items: center;
+    gap: 1rem;
+}
+
+#user-info {
+    font-size: 1rem;
 }
 
 /* Modo oscuro */
 body.dark-mode {
-    background-color: #222;
+    background-color: #1a1a1a;
     color: #eee;
 }
 
@@ -34,55 +44,83 @@ body.dark-mode header {
     background-color: #111;
 }
 
-body.dark-mode .producto, 
-body.dark-mode .carrito,
-body.dark-mode .registro-seccion {
-    background-color: #333;
+body.dark-mode .auth-card,
+body.dark-mode .producto,
+body.dark-mode .carrito {
+    background-color: #2c2c2c;
     border-color: #444;
+    color: #eee;
 }
 
 body.dark-mode .form-grupo input {
-    background-color: #222;
+    background-color: #1a1a1a;
     color: #eee;
     border-color: #555;
 }
 
-body.dark-mode .item-cliente {
-    background-color: #2a2a2a;
-    border-color: #444;
-    color: #eee;
+body.dark-mode .tab-btn {
+    background-color: #222;
+    color: #aaa;
 }
 
-body.dark-mode .item-cliente small {
-    color: #bbb;
+body.dark-mode .tab-btn.activo {
+    background-color: #007bff;
+    color: white;
 }
 
-/* ================================
-   Módulo de Registro de Clientes
-   ================================ */
-.registro-seccion {
-    flex: 1;
-    min-width: 280px;
+/* =========================================
+   Pantalla de Autenticación (Login / Registro)
+   ========================================= */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem 1rem;
+}
+
+.auth-card {
     background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
     border: 1px solid #ddd;
-    padding: 1.2rem;
-    border-radius: 8px;
-    align-self: flex-start;
+    text-align: center;
 }
 
-.registro-seccion h2, .registro-seccion h3 {
-    margin-top: 0;
+.auth-tabs {
+    display: flex;
+    margin-bottom: 1.5rem;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #ddd;
 }
 
-.registro-seccion h3 {
-    margin-top: 1.5rem;
-    font-size: 1.1rem;
-    border-bottom: 2px solid #007bff;
-    padding-bottom: 0.3rem;
+.tab-btn {
+    flex: 1;
+    padding: 0.7rem;
+    border: none;
+    background: #f1f1f1;
+    color: #555;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.tab-btn.activo {
+    background: #007bff;
+    color: white;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
 }
 
 .form-grupo {
-    margin-bottom: 0.8rem;
+    margin-bottom: 1rem;
     display: flex;
     flex-direction: column;
 }
@@ -90,43 +128,42 @@ body.dark-mode .item-cliente small {
 .form-grupo label {
     font-size: 0.85rem;
     font-weight: bold;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.3rem;
 }
 
 .form-grupo input {
-    padding: 0.5rem;
+    padding: 0.6rem;
     border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 0.9rem;
+    border-radius: 5px;
+    font-size: 0.95rem;
     outline: none;
-    transition: border-color 0.2s;
 }
 
 .form-grupo input:focus {
     border-color: #007bff;
 }
 
-#btn-registrar {
-    width: 100%;
+.btn-primary {
     background-color: #007bff;
     color: white;
-    padding: 0.6rem;
-    font-size: 0.95rem;
+    padding: 0.7rem;
+    font-size: 1rem;
     font-weight: bold;
-    border-radius: 4px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
     margin-top: 0.5rem;
 }
 
-#btn-registrar:hover {
+.btn-primary:hover {
     background-color: #0056b3;
 }
 
-#mensaje-registro {
-    min-height: 22px;
-    margin-top: 0.5rem;
-    font-size: 0.85rem;
+#auth-mensaje {
+    margin-top: 1rem;
+    font-size: 0.9rem;
     font-weight: bold;
-    text-align: center;
+    min-height: 22px;
 }
 
 .mensaje-exito {
@@ -137,59 +174,21 @@ body.dark-mode .item-cliente small {
     color: #dc3545;
 }
 
-.mensaje-info {
-    color: #17a2b8;
-}
-
-#lista-clientes {
-    margin-top: 0.8rem;
-    max-height: 260px;
-    overflow-y: auto;
-}
-
-.item-cliente {
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 6px;
-    padding: 0.6rem;
-    margin-bottom: 0.5rem;
+/* =========================================
+   Pantalla de Tienda
+   ========================================= */
+main {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding: 2rem;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.item-cliente small {
-    color: #666;
-    display: block;
-    margin-top: 2px;
-    font-size: 0.8rem;
-}
-
-.btn-eliminar-cliente {
-    background-color: #dc3545;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
-    flex-shrink: 0;
-}
-
-.btn-eliminar-cliente:hover {
-    background-color: #bd2130;
-}
-
-.sin-clientes {
-    color: #888;
-    font-style: italic;
-    font-size: 0.85rem;
-    text-align: center;
-}
-
-/* ================================
-   Módulo de Productos
-   ================================ */
 .productos {
     flex: 2;
-    min-width: 300px;
+    min-width: 320px;
 }
 
 .productos h2 {
@@ -198,23 +197,24 @@ body.dark-mode .item-cliente small {
 
 .grid-productos {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
 }
 
 .producto {
     background: white;
     border: 1px solid #ddd;
-    padding: 1rem;
-    border-radius: 5px;
+    padding: 1.5rem 1rem;
+    border-radius: 8px;
     text-align: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
 button {
     cursor: pointer;
     padding: 0.5rem 1rem;
     border: none;
-    border-radius: 3px;
+    border-radius: 4px;
     background-color: #28a745;
     color: white;
     transition: background-color 0.2s;
@@ -224,25 +224,32 @@ button:hover {
     background-color: #218838;
 }
 
-#btn-theme {
+#btn-theme, #btn-logout {
     background-color: #343a40;
 }
 
-#btn-theme:hover {
+#btn-theme:hover, #btn-logout:hover {
     background-color: #23272b;
 }
 
-/* ================================
-   Módulo de Carrito
-   ================================ */
+#btn-logout {
+    background-color: #dc3545;
+}
+
+#btn-logout:hover {
+    background-color: #bd2130;
+}
+
+/* Carrito */
 .carrito {
     flex: 1;
-    min-width: 250px;
+    min-width: 280px;
     background: white;
     border: 1px solid #ddd;
-    padding: 1rem;
-    border-radius: 5px;
+    padding: 1.5rem;
+    border-radius: 8px;
     align-self: flex-start;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
 .carrito h2 {
@@ -254,20 +261,21 @@ button:hover {
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #eee;
-    padding: 0.5rem 0;
+    padding: 0.6rem 0;
 }
 
 .btn-eliminar {
     background-color: #dc3545;
-    padding: 0.2rem 0.5rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
 }
 
 .btn-eliminar:hover {
-    background-color: #c82333;
+    background-color: #bd2130;
 }
 
 .carrito-footer {
-    margin-top: 1rem;
+    margin-top: 1.5rem;
     text-align: right;
     font-weight: bold;
 }
@@ -280,4 +288,11 @@ button:hover {
 
 #btn-vaciar:hover {
     background-color: #e0a800;
+}
+
+.carrito-vacio {
+    color: #888;
+    font-style: italic;
+    text-align: center;
+    margin: 1rem 0;
 }

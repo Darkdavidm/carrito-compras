@@ -1,162 +1,188 @@
-// ==========================================
-// 1. Modo Claro / Oscuro
-// ==========================================
+// ==============================================================
+// 1. TEMA CLARO / OSCURO
+// ==============================================================
 const btnTheme = document.getElementById('btn-theme');
 const body = document.body;
 
 btnTheme.addEventListener('click', () => {
     body.classList.toggle('dark-mode');
-    
-    if (body.classList.contains('dark-mode')) {
-        btnTheme.textContent = 'Modo Claro';
-    } else {
-        btnTheme.textContent = 'Modo Oscuro';
-    }
+    btnTheme.textContent = body.classList.contains('dark-mode') ? 'Modo Claro' : 'Modo Oscuro';
 });
 
 
-// ==========================================
-// 2. Módulo de Registro de Clientes / Usuarios
-// ==========================================
+// ==============================================================
+// 2. SISTEMA DE AUTENTICACIÓN Y USUARIOS
+// ==============================================================
+// Elementos de la interfaz
+const seccionAuth = document.getElementById('seccion-auth');
+const seccionTienda = document.getElementById('seccion-tienda');
+const userInfo = document.getElementById('user-info');
+const userName = document.getElementById('user-name');
+const btnLogout = document.getElementById('btn-logout');
+
+const tabLogin = document.getElementById('tab-login');
+const tabRegistro = document.getElementById('tab-registro');
+const formLogin = document.getElementById('form-login');
 const formRegistro = document.getElementById('form-registro');
-const listaClientes = document.getElementById('lista-clientes');
-const mensajeRegistro = document.getElementById('mensaje-registro');
+const authMensaje = document.getElementById('auth-mensaje');
 
-// Cargar clientes desde localStorage o iniciar con un arreglo vacío
-let clientes = JSON.parse(localStorage.getItem('clientes_tienda')) || [];
+// Almacenamiento en LocalStorage
+// Estructura de cada usuario: { id, nombre, email, password, carrito: [] }
+let usuarios = JSON.parse(localStorage.getItem('tienda_usuarios')) || [];
+let usuarioActivo = JSON.parse(localStorage.getItem('tienda_usuario_activo')) || null;
 
-// Capturar el evento de envío del formulario
+// Alternar entre pestañas de Login y Registro
+tabLogin.addEventListener('click', () => {
+    tabLogin.classList.add('activo');
+    tabRegistro.classList.remove('activo');
+    formLogin.classList.remove('oculto');
+    formRegistro.classList.add('oculto');
+    limpiarMensaje();
+});
+
+tabRegistro.addEventListener('click', () => {
+    tabRegistro.classList.add('activo');
+    tabLogin.classList.remove('activo');
+    formRegistro.classList.remove('oculto');
+    formLogin.classList.add('oculto');
+    limpiarMensaje();
+});
+
+// Evento: Registro de nuevo usuario
 formRegistro.addEventListener('submit', (e) => {
-    e.preventDefault(); // Evita recargar la página
+    e.preventDefault();
 
-    // Capturar valores de los campos
     const nombre = document.getElementById('reg-nombre').value.trim();
-    const email = document.getElementById('reg-email').value.trim();
-    const telefono = document.getElementById('reg-telefono').value.trim();
-    const direccion = document.getElementById('reg-direccion').value.trim();
+    const email = document.getElementById('reg-email').value.trim().toLowerCase();
+    const password = document.getElementById('reg-password').value;
 
-    // Validar campos vacíos
-    if (!nombre || !email || !telefono || !direccion) {
-        mostrarMensaje('Por favor, completa todos los campos requeridos.', 'error');
+    // Verificar si el correo ya está registrado
+    const usuarioExistente = usuarios.find(u => u.email === email);
+    if (usuarioExistente) {
+        mostrarMensaje('Este correo ya está registrado. Inicia sesión.', 'error');
         return;
     }
 
-    // Crear el objeto del nuevo cliente
-    const nuevoCliente = {
+    // Crear nuevo usuario con su carrito personal vacío
+    const nuevoUsuario = {
         id: Date.now(),
         nombre: nombre,
         email: email,
-        telefono: telefono,
-        direccion: direccion
+        password: password,
+        carrito: []
     };
 
-    // Agregar al arreglo
-    clientes.push(nuevoCliente);
+    usuarios.push(nuevoUsuario);
+    guardarUsuarios();
 
-    // Guardar en localStorage y actualizar la vista en el DOM
-    guardarYRenderizarClientes();
-
-    // Notificar al usuario y limpiar el formulario
-    mostrarMensaje('¡Cliente registrado con éxito!', 'exito');
+    mostrarMensaje('¡Cuenta creada con éxito! Ahora puedes iniciar sesión.', 'exito');
     formRegistro.reset();
+
+    // Cambiar a la pestaña de login automáticamente
+    setTimeout(() => {
+        tabLogin.click();
+    }, 1500);
 });
 
-// Función para guardar en localStorage y volver a renderizar
-function guardarYRenderizarClientes() {
-    localStorage.setItem('clientes_tienda', JSON.stringify(clientes));
-    renderizarClientes();
-}
+// Evento: Iniciar sesión
+formLogin.addEventListener('submit', (e) => {
+    e.preventDefault();
 
-// Renderizado dinámico de clientes en el DOM
-function renderizarClientes() {
-    listaClientes.innerHTML = '';
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
+    const password = document.getElementById('login-password').value;
 
-    if (clientes.length === 0) {
-        const sinClientes = document.createElement('p');
-        sinClientes.className = 'sin-clientes';
-        sinClientes.textContent = 'No hay clientes registrados.';
-        listaClientes.appendChild(sinClientes);
+    // Buscar coincidencia de credenciales
+    const usuarioEncontrado = usuarios.find(u => u.email === email && u.password === password);
+
+    if (!usuarioEncontrado) {
+        mostrarMensaje('Correo o contraseña incorrectos.', 'error');
         return;
     }
 
-    clientes.forEach((cliente, index) => {
-        // Crear contenedor para cada cliente
-        const divCliente = document.createElement('div');
-        divCliente.className = 'item-cliente';
+    // Iniciar sesión
+    iniciarSesion(usuarioEncontrado);
+});
 
-        // Crear contenedor con información del cliente
-        const info = document.createElement('div');
-        info.innerHTML = `<strong>${cliente.nombre}</strong><small>📧 ${cliente.email} | 📞 ${cliente.telefono} | 📍 ${cliente.direccion}</small>`;
+// Función para iniciar sesión y mostrar la tienda
+function iniciarSesion(usuario) {
+    usuarioActivo = usuario;
+    localStorage.setItem('tienda_usuario_activo', JSON.stringify(usuarioActivo));
 
-        // Crear botón para eliminar cliente
-        const btnEliminar = document.createElement('button');
-        btnEliminar.className = 'btn-eliminar-cliente';
-        btnEliminar.textContent = 'Eliminar';
-        btnEliminar.addEventListener('click', () => {
-            eliminarCliente(index);
-        });
+    // Cambiar de pantalla: ocultar login, mostrar tienda
+    seccionAuth.classList.add('oculto');
+    seccionTienda.classList.remove('oculto');
+    userInfo.classList.remove('oculto');
+    btnLogout.classList.remove('oculto');
+    userName.textContent = usuarioActivo.nombre;
 
-        // Ensamblar nodos
-        divCliente.appendChild(info);
-        divCliente.appendChild(btnEliminar);
+    limpiarMensaje();
+    formLogin.reset();
 
-        listaClientes.appendChild(divCliente);
-    });
+    // Renderizar el carrito personal de este usuario
+    renderizarCarrito();
 }
 
-// Función para eliminar un cliente por su índice
-function eliminarCliente(index) {
-    clientes.splice(index, 1);
-    guardarYRenderizarClientes();
-    mostrarMensaje('Cliente eliminado correctamente.', 'info');
+// Evento: Cerrar sesión
+btnLogout.addEventListener('click', () => {
+    usuarioActivo = null;
+    localStorage.removeItem('tienda_usuario_activo');
+
+    // Volver a la pantalla de login
+    seccionTienda.classList.add('oculto');
+    userInfo.classList.add('oculto');
+    btnLogout.classList.add('oculto');
+    seccionAuth.classList.remove('oculto');
+
+    tabLogin.click();
+});
+
+function guardarUsuarios() {
+    localStorage.setItem('tienda_usuarios', JSON.stringify(usuarios));
 }
 
-// Mostrar mensajes de alerta temporales
 function mostrarMensaje(texto, tipo) {
-    mensajeRegistro.textContent = texto;
-    mensajeRegistro.className = `mensaje-${tipo}`;
-    
-    setTimeout(() => {
-        mensajeRegistro.textContent = '';
-        mensajeRegistro.className = '';
-    }, 3000);
+    authMensaje.textContent = texto;
+    authMensaje.className = `mensaje-${tipo}`;
 }
 
-// Renderizar clientes almacenados al cargar la página
-renderizarClientes();
+function limpiarMensaje() {
+    authMensaje.textContent = '';
+    authMensaje.className = '';
+}
 
 
-// ==========================================
-// 3. Módulo de Carrito de Compras Básico
-// ==========================================
-let carrito = [];
+// ==============================================================
+// 3. MÓDULO DE CARRITO DE COMPRAS PERSONALIZADO POR USUARIO
+// ==============================================================
 const listaCarrito = document.getElementById('lista-carrito');
 const contenedorTotal = document.getElementById('total-carrito');
 const btnVaciar = document.getElementById('btn-vaciar');
 
-// Capturar botones de "Agregar"
+// Capturar botones de "Agregar al Carrito"
 const botonesAgregar = document.querySelectorAll('.btn-agregar');
-
 botonesAgregar.forEach(boton => {
     boton.addEventListener('click', agregarAlCarrito);
 });
 
 function agregarAlCarrito(e) {
     e.preventDefault();
+    if (!usuarioActivo) return;
 
-    // Obtener los datos del botón (data-attributes)
     const boton = e.target;
     const id = boton.getAttribute('data-id');
     const nombre = boton.getAttribute('data-nombre');
     const precio = parseFloat(boton.getAttribute('data-precio'));
 
-    const producto = {
-        id: id,
-        nombre: nombre,
-        precio: precio
-    };
+    const producto = { id, nombre, precio };
 
-    carrito.push(producto);
+    // Agregar al carrito exclusivo del usuario activo
+    if (!usuarioActivo.carrito) {
+        usuarioActivo.carrito = [];
+    }
+    usuarioActivo.carrito.push(producto);
+
+    // Guardar cambios en el almacenamiento persistente
+    sincronizarUsuarioActivo();
     renderizarCarrito();
 }
 
@@ -164,7 +190,13 @@ function renderizarCarrito() {
     listaCarrito.innerHTML = '';
     let total = 0;
 
-    carrito.forEach((producto, index) => {
+    if (!usuarioActivo || !usuarioActivo.carrito || usuarioActivo.carrito.length === 0) {
+        listaCarrito.innerHTML = '<p class="carrito-vacio">Tu carrito está vacío.</p>';
+        contenedorTotal.textContent = '0';
+        return;
+    }
+
+    usuarioActivo.carrito.forEach((producto, index) => {
         const divItem = document.createElement('div');
         divItem.classList.add('item-carrito');
 
@@ -174,15 +206,14 @@ function renderizarCarrito() {
         const btnEliminar = document.createElement('button');
         btnEliminar.classList.add('btn-eliminar');
         btnEliminar.textContent = 'Eliminar';
-        
         btnEliminar.addEventListener('click', () => {
             eliminarProducto(index);
         });
 
         divItem.appendChild(pInfo);
         divItem.appendChild(btnEliminar);
-
         listaCarrito.appendChild(divItem);
+
         total += producto.precio;
     });
 
@@ -190,12 +221,33 @@ function renderizarCarrito() {
 }
 
 function eliminarProducto(index) {
-    carrito.splice(index, 1);
+    if (!usuarioActivo) return;
+    usuarioActivo.carrito.splice(index, 1);
+    sincronizarUsuarioActivo();
     renderizarCarrito();
 }
 
-// Vaciar carrito
 btnVaciar.addEventListener('click', () => {
-    carrito = [];
+    if (!usuarioActivo) return;
+    usuarioActivo.carrito = [];
+    sincronizarUsuarioActivo();
     renderizarCarrito();
 });
+
+// Guardar los cambios del usuario activo en la lista general de usuarios
+function sincronizarUsuarioActivo() {
+    localStorage.setItem('tienda_usuario_activo', JSON.stringify(usuarioActivo));
+    const index = usuarios.findIndex(u => u.id === usuarioActivo.id);
+    if (index !== -1) {
+        usuarios[index] = usuarioActivo;
+        guardarUsuarios();
+    }
+}
+
+
+// ==============================================================
+// 4. INICIALIZACIÓN: COMPROBAR SI YA HABÍA SESIÓN INICIADA
+// ==============================================================
+if (usuarioActivo) {
+    iniciarSesion(usuarioActivo);
+}
