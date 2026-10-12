@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Tienda Web - Carrito y Usuarios</title>
-    <!-- Parámetro de versión para evitar caché en navegadores -->
     <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body>
@@ -13,7 +12,6 @@
             <h1>Mi Tienda Web</h1>
         </div>
         
-        <!-- Información del usuario logueado -->
         <div id="user-header-info" class="user-header-info oculto">
             <div class="user-text">
                 <span class="user-saludo">Bienvenido, <strong id="user-name"></strong></span>
@@ -27,9 +25,6 @@
         </div>
     </header>
 
-    <!-- ==============================================
-         PANTALLA DE ACCESO (LOGIN Y REGISTRO)
-         ============================================== -->
     <section id="seccion-auth" class="auth-container">
         <div class="auth-card">
             <h2>Acceso a la Tienda</h2>
@@ -39,7 +34,6 @@
                 <button id="tab-registro" class="tab-btn">Registrarse</button>
             </div>
 
-            <!-- Formulario de Iniciar Sesión -->
             <form id="form-login" class="auth-form">
                 <div class="demo-box">
                     <p><strong>👤 Usuario Demo Registrado:</strong></p>
@@ -58,7 +52,6 @@
                 <button type="submit" class="btn-primary">Ingresar a la Tienda</button>
             </form>
 
-            <!-- Formulario de Registro de Usuario / Cliente -->
             <form id="form-registro" class="auth-form oculto">
                 <div class="form-grupo">
                     <label for="reg-nombre">Nombre Completo:</label>
@@ -87,11 +80,7 @@
         </div>
     </section>
 
-    <!-- ==============================================
-         PANTALLA PRINCIPAL DE LA TIENDA (Solo con sesión)
-         ============================================== -->
     <main id="seccion-tienda" class="oculto">
-        <!-- Catálogo de Productos -->
         <section class="productos">
             <h2>Productos Disponibles</h2>
             <div class="grid-productos">
@@ -113,11 +102,9 @@
             </div>
         </section>
 
-        <!-- Carrito de Compras Personalizado -->
         <section class="carrito">
             <h2>Mi Carrito</h2>
             <div id="lista-carrito">
-                <!-- Se renderizan los productos de este usuario -->
             </div>
             <div class="carrito-footer">
                 <p>Total: $<span id="total-carrito">0</span></p>

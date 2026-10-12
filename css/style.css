@@ -112,9 +112,6 @@ body.dark-mode .tab-btn.activo {
     color: white;
 }
 
-/* =========================================
-   Pantalla de Autenticación (Login / Registro)
-   ========================================= */
 .auth-container {
     display: flex;
     justify-content: center;
@@ -248,9 +245,6 @@ body.dark-mode .tab-btn.activo {
     color: #dc3545;
 }
 
-/* =========================================
-   Pantalla de Tienda
-   ========================================= */
 main {
     display: flex;
     flex-wrap: wrap;

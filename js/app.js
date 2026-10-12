@@ -1,6 +1,3 @@
-// ==============================================================
-// 1. TEMA CLARO / OSCURO
-// ==============================================================
 const btnTheme = document.getElementById('btn-theme');
 const body = document.body;
 
@@ -9,10 +6,6 @@ btnTheme.addEventListener('click', () => {
     btnTheme.textContent = body.classList.contains('dark-mode') ? 'Modo Claro' : 'Modo Oscuro';
 });
 
-
-// ==============================================================
-// 2. SISTEMA DE AUTENTICACIÓN Y CLIENTES / USUARIOS
-// ==============================================================
 const seccionAuth = document.getElementById('seccion-auth');
 const seccionTienda = document.getElementById('seccion-tienda');
 const userHeaderInfo = document.getElementById('user-header-info');
@@ -27,7 +20,6 @@ const formRegistro = document.getElementById('form-registro');
 const authMensaje = document.getElementById('auth-mensaje');
 const btnAutofill = document.getElementById('btn-autofill');
 
-// Usuario de Ejemplo solicitado (Jesús Contreras)
 const usuarioDefault = {
     id: 1,
     nombre: "Jesús Contreras",
@@ -40,16 +32,13 @@ const usuarioDefault = {
     ]
 };
 
-// Cargar usuarios de localStorage
 let usuarios = JSON.parse(localStorage.getItem('tienda_usuarios')) || [];
 
-// Asegurarse de que el usuario de ejemplo Jesús Contreras siempre exista
 const existeJesus = usuarios.find(u => u.email === usuarioDefault.email);
 if (!existeJesus) {
     usuarios.unshift(usuarioDefault);
     localStorage.setItem('tienda_usuarios', JSON.stringify(usuarios));
 } else {
-    // Si ya existe pero le faltan teléfono o dirección, actualizarlos
     if (!existeJesus.telefono) existeJesus.telefono = usuarioDefault.telefono;
     if (!existeJesus.direccion) existeJesus.direccion = usuarioDefault.direccion;
     localStorage.setItem('tienda_usuarios', JSON.stringify(usuarios));
@@ -57,7 +46,6 @@ if (!existeJesus) {
 
 let usuarioActivo = JSON.parse(localStorage.getItem('tienda_usuario_activo')) || null;
 
-// Botón de rellenar credenciales de Jesús Contreras para pruebas rápidas
 if (btnAutofill) {
     btnAutofill.addEventListener('click', () => {
         document.getElementById('login-email').value = usuarioDefault.email;
@@ -65,7 +53,6 @@ if (btnAutofill) {
     });
 }
 
-// Alternar entre pestañas de Login y Registro
 tabLogin.addEventListener('click', () => {
     tabLogin.classList.add('activo');
     tabRegistro.classList.remove('activo');
@@ -82,7 +69,6 @@ tabRegistro.addEventListener('click', () => {
     limpiarMensaje();
 });
 
-// Evento: Registro de nuevo usuario
 formRegistro.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -120,7 +106,6 @@ formRegistro.addEventListener('submit', (e) => {
     }, 1200);
 });
 
-// Evento: Iniciar sesión
 formLogin.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -137,7 +122,6 @@ formLogin.addEventListener('submit', (e) => {
     iniciarSesion(usuarioEncontrado);
 });
 
-// Función para iniciar sesión y mostrar la tienda
 function iniciarSesion(usuario) {
     usuarioActivo = usuario;
     localStorage.setItem('tienda_usuario_activo', JSON.stringify(usuarioActivo));
@@ -153,11 +137,9 @@ function iniciarSesion(usuario) {
     limpiarMensaje();
     formLogin.reset();
 
-    // Renderizar el carrito exclusivo de este usuario
     renderizarCarrito();
 }
 
-// Evento: Cerrar sesión
 btnLogout.addEventListener('click', () => {
     usuarioActivo = null;
     localStorage.removeItem('tienda_usuario_activo');
@@ -183,10 +165,6 @@ function limpiarMensaje() {
     authMensaje.className = '';
 }
 
-
-// ==============================================================
-// 3. MÓDULO DE CARRITO DE COMPRAS PERSONALIZADO POR USUARIO
-// ==============================================================
 const listaCarrito = document.getElementById('lista-carrito');
 const contenedorTotal = document.getElementById('total-carrito');
 const btnVaciar = document.getElementById('btn-vaciar');
@@ -273,10 +251,6 @@ function sincronizarUsuarioActivo() {
     }
 }
 
-
-// ==============================================================
-// 4. INICIALIZACIÓN: COMPROBAR SESIÓN ACTIVA PREVIA
-// ==============================================================
 if (usuarioActivo) {
     iniciarSesion(usuarioActivo);
 }
