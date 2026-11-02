@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechNova Store | Aplicación Web Interactiva</title>
-    <link rel="stylesheet" href="css/style.css?v=6">
+    <link rel="stylesheet" href="css/style.css?v=7">
 </head>
 <body>
     <header>
@@ -29,14 +29,11 @@
                     <span class="user-datos" id="user-datos"></span>
                 </div>
 
-                <div id="admin-nav-switch" class="admin-nav-switch oculto">
-                    <button id="btn-vista-tienda" class="btn-nav-vista activo" type="button">🛍️ Tienda</button>
-                    <button id="btn-vista-admin" class="btn-nav-vista" type="button">🛠️ Administrar Usuarios</button>
-                </div>
-
-                <span class="badge-carrito" title="Artículos en el carrito">
+                <!-- Contador de carrito visible únicamente para rol Cliente -->
+                <span id="header-badge-carrito" class="badge-carrito" title="Artículos en el carrito">
                     🛍️ <span id="header-contador-carrito">0</span>
                 </span>
+
                 <button id="btn-logout" class="btn-logout" type="button">Cerrar Sesión</button>
             </div>
 
@@ -46,10 +43,13 @@
         </nav>
     </header>
 
+    <!-- ===================================================================
+         SECCIÓN DE ACCESO (LOGIN Y REGISTRO DE CLIENTES)
+         =================================================================== -->
     <section id="seccion-auth" class="auth-container">
         <div class="auth-card">
             <h2>Acceso a la Plataforma</h2>
-            <p class="auth-subtitulo">Inicia sesión como cliente o administrador, o registra una nueva cuenta</p>
+            <p class="auth-subtitulo">Ingresa como Administrador para gestionar productos y usuarios, o como Cliente para comprar</p>
 
             <div class="auth-tabs">
                 <button id="tab-login" class="tab-btn activo" type="button">Iniciar Sesión</button>
@@ -77,11 +77,11 @@
                     <input type="password" id="login-password" placeholder="Ingresa tu contraseña">
                     <small class="error" id="error-login-password"></small>
                 </div>
-                <button type="submit" class="btn-primary">Ingresar a la Tienda</button>
+                <button type="submit" class="btn-primary">Ingresar</button>
                 <button type="button" id="btn-olvido-clave" class="btn-link">¿Olvidaste tu contraseña?</button>
             </form>
 
-            <!-- Formulario de Registro con validación JS y expresiones regulares -->
+            <!-- Formulario de Registro de Clientes -->
             <form id="form-registro" class="auth-form oculto" novalidate>
                 <div class="form-grupo">
                     <label for="reg-nombre">Nombre Completo:</label>
@@ -113,93 +113,37 @@
                     <input type="password" id="reg-confirmar" placeholder="Repite tu contraseña">
                     <small class="error" id="error-reg-confirmar"></small>
                 </div>
-                <button type="submit" class="btn-primary">Crear Cuenta y Registrarse</button>
+                <button type="submit" class="btn-primary">Crear Cuenta de Cliente</button>
             </form>
 
             <p id="auth-mensaje"></p>
         </div>
     </section>
 
-    <!-- VISTA 1: TIENDA Y CARRITO DE COMPRAS -->
+    <!-- ===================================================================
+         VISTA CLIENTE: TIENDA ONLINE, CARRITO Y PEDIDOS
+         =================================================================== -->
     <main id="seccion-tienda" class="oculto">
         <div class="columna-principal">
             <section class="productos">
                 <div class="catalogo-encabezado">
                     <h2>Catálogo de Productos</h2>
-                    <span id="contador-resultados" class="contador-resultados">Mostrando 6 productos</span>
+                    <span id="contador-resultados" class="contador-resultados"></span>
                 </div>
 
-                <!-- Controles interactivos de búsqueda y filtrado -->
+                <!-- Controles dinámicos de búsqueda y categorías -->
                 <div class="controles-catalogo">
                     <input
                         type="search"
                         id="input-buscar"
                         class="input-buscar"
-                        placeholder="🔍 Buscar producto por nombre o descripción..."
+                        placeholder="🔍 Buscar producto por nombre, categoría o descripción..."
                     >
-                    <div class="filtros-categoria">
-                        <button type="button" class="btn-filtro activo" data-filtro="todos">Todos</button>
-                        <button type="button" class="btn-filtro" data-filtro="Periféricos">Periféricos</button>
-                        <button type="button" class="btn-filtro" data-filtro="Audio">Audio</button>
-                        <button type="button" class="btn-filtro" data-filtro="Accesorios">Accesorios</button>
-                    </div>
+                    <div id="filtros-categoria" class="filtros-categoria"></div>
                 </div>
 
-                <div id="grid-productos" class="grid-productos">
-                    <article class="producto" data-categoria="Audio">
-                        <span class="producto-icono">🎧</span>
-                        <span class="producto-tag">Audio</span>
-                        <h3>Audífonos Bluetooth ANC</h3>
-                        <p class="producto-desc">Cancelación activa de ruido y batería de 30 horas.</p>
-                        <p class="producto-precio">$85</p>
-                        <button class="btn-agregar" data-id="1" data-nombre="Audífonos Bluetooth ANC" data-precio="85">Agregar al Carrito</button>
-                    </article>
-
-                    <article class="producto" data-categoria="Periféricos">
-                        <span class="producto-icono">⌨️</span>
-                        <span class="producto-tag">Periféricos</span>
-                        <h3>Teclado Mecánico RGB</h3>
-                        <p class="producto-desc">Switches táctiles silenciosos e iluminación personalizable.</p>
-                        <p class="producto-precio">$120</p>
-                        <button class="btn-agregar" data-id="2" data-nombre="Teclado Mecánico RGB" data-precio="120">Agregar al Carrito</button>
-                    </article>
-
-                    <article class="producto" data-categoria="Periféricos">
-                        <span class="producto-icono">🖱️</span>
-                        <span class="producto-tag">Periféricos</span>
-                        <h3>Mouse Inalámbrico Pro</h3>
-                        <p class="producto-desc">Sensor óptico de alta precisión y diseño ergonómico.</p>
-                        <p class="producto-precio">$45</p>
-                        <button class="btn-agregar" data-id="3" data-nombre="Mouse Inalámbrico Pro" data-precio="45">Agregar al Carrito</button>
-                    </article>
-
-                    <article class="producto" data-categoria="Accesorios">
-                        <span class="producto-icono">📷</span>
-                        <span class="producto-tag">Accesorios</span>
-                        <h3>Webcam Full HD 1080p</h3>
-                        <p class="producto-desc">Micrófono estéreo integrado y enfoque automático.</p>
-                        <p class="producto-precio">$65</p>
-                        <button class="btn-agregar" data-id="4" data-nombre="Webcam Full HD 1080p" data-precio="65">Agregar al Carrito</button>
-                    </article>
-
-                    <article class="producto" data-categoria="Audio">
-                        <span class="producto-icono">🔊</span>
-                        <span class="producto-tag">Audio</span>
-                        <h3>Parlante Portátil Smart</h3>
-                        <p class="producto-desc">Sonido envolvente 360° resistente a salpicaduras.</p>
-                        <p class="producto-precio">$70</p>
-                        <button class="btn-agregar" data-id="5" data-nombre="Parlante Portátil Smart" data-precio="70">Agregar al Carrito</button>
-                    </article>
-
-                    <article class="producto" data-categoria="Accesorios">
-                        <span class="producto-icono">💻</span>
-                        <span class="producto-tag">Accesorios</span>
-                        <h3>Base Refrigerante Laptop</h3>
-                        <p class="producto-desc">Doble ventilador silencioso y altura ajustable en 5 niveles.</p>
-                        <p class="producto-precio">$35</p>
-                        <button class="btn-agregar" data-id="6" data-nombre="Base Refrigerante Laptop" data-precio="35">Agregar al Carrito</button>
-                    </article>
-                </div>
+                <!-- Catálogo renderizado dinámicamente desde localStorage -->
+                <div id="grid-productos" class="grid-productos"></div>
 
                 <p id="sin-resultados" class="carrito-vacio oculto">
                     No se encontraron productos que coincidan con tu búsqueda.
@@ -232,134 +176,264 @@
         </aside>
     </main>
 
-    <!-- VISTA 2: PANEL DE ADMINISTRACIÓN DE USUARIOS (SOLO ROL ADMIN) -->
+    <!-- ===================================================================
+         VISTA ADMINISTRADOR: GESTIÓN DE PRODUCTOS, CATEGORÍAS Y USUARIOS
+         =================================================================== -->
     <section id="seccion-admin" class="admin-wrapper oculto">
         <div class="admin-header-bar">
             <div>
-                <h2>🛠️ Panel de Administración de Usuarios</h2>
-                <p class="admin-subtitulo">Gestiona los datos personales, roles y recuperación de contraseñas de las cuentas registradas</p>
+                <h2>🛠️ Consola de Administración</h2>
+                <p class="admin-subtitulo">Control centralizado del catálogo de productos, precios, categorías, imágenes y cuentas de usuarios</p>
             </div>
-            <button id="btn-volver-tienda" class="btn-volver-tienda" type="button">← Volver a la Tienda</button>
+
+            <div class="admin-tabs-principales">
+                <button id="tab-admin-productos" class="btn-tab-admin activo" type="button">
+                    📦 Productos y Categorías
+                </button>
+                <button id="tab-admin-usuarios" class="btn-tab-admin" type="button">
+                    👥 Usuarios y Contraseñas
+                </button>
+            </div>
         </div>
 
+        <!-- Indicadores globales del negocio -->
         <div class="admin-kpis">
+            <div class="kpi-card">
+                <span class="kpi-numero" id="kpi-total-productos">0</span>
+                <span class="kpi-label">Productos en Venta</span>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-numero" id="kpi-total-categorias">0</span>
+                <span class="kpi-label">Categorías Activas</span>
+            </div>
             <div class="kpi-card">
                 <span class="kpi-numero" id="kpi-total-usuarios">0</span>
                 <span class="kpi-label">Usuarios Registrados</span>
             </div>
             <div class="kpi-card">
-                <span class="kpi-numero" id="kpi-total-admins">0</span>
-                <span class="kpi-label">Administradores</span>
-            </div>
-            <div class="kpi-card">
                 <span class="kpi-numero" id="kpi-total-pedidos">0</span>
-                <span class="kpi-label">Pedidos en el Sistema</span>
+                <span class="kpi-label">Pedidos de Clientes</span>
             </div>
         </div>
 
-        <div class="admin-grid">
-            <div class="admin-lista-box">
+        <!-- MÓDULO ADMIN 1: CONTROL DE PRODUCTOS, PRECIOS, CATEGORÍAS E IMÁGENES -->
+        <div id="subvista-admin-productos">
+            <!-- Barra de gestión de categorías -->
+            <div class="admin-categorias-box">
                 <div class="catalogo-encabezado">
-                    <h3>Directorio de Cuentas</h3>
-                    <span id="contador-usuarios-admin" class="contador-resultados"></span>
+                    <div>
+                        <h3>🏷️ Categorías de la Tienda</h3>
+                        <p class="texto-ayuda">Agrega o elimina categorías; los filtros de la tienda se actualizan automáticamente.</p>
+                    </div>
+                    <button id="btn-restaurar-catalogo" class="btn-restaurar" type="button" title="Restaurar los 6 productos iniciales de demostración">
+                        ↺ Restaurar Catálogo Demo
+                    </button>
                 </div>
 
-                <input
-                    type="search"
-                    id="input-buscar-usuario"
-                    class="input-buscar"
-                    placeholder="🔍 Buscar usuario por nombre, correo o teléfono..."
-                >
+                <div class="categorias-layout">
+                    <form id="form-nueva-categoria" class="form-inline-categoria" novalidate>
+                        <input
+                            type="text"
+                            id="input-nueva-categoria"
+                            placeholder="Nueva categoría (ej. Monitores, Gaming...)"
+                        >
+                        <button type="submit" class="btn-primary">+ Crear Categoría</button>
+                    </form>
 
-                <p id="admin-lista-mensaje" class="admin-feedback"></p>
-
-                <div id="lista-usuarios-admin" class="lista-usuarios-admin"></div>
+                    <div id="lista-categorias-admin" class="chips-categorias"></div>
+                </div>
+                <p id="admin-cat-mensaje" class="admin-feedback"></p>
             </div>
 
-            <aside class="admin-accion-box">
-                <div id="admin-panel-vacio" class="admin-panel-vacio">
-                    <span class="admin-icono-guia">⚙️</span>
-                    <h3>Gestión de Cuenta</h3>
-                    <p>Selecciona <strong>Editar Datos</strong> para actualizar la información o el rol de un usuario, o <strong>Cambiar Clave</strong> si olvidó su contraseña.</p>
+            <!-- Grilla principal de inventario + editor de producto -->
+            <div class="admin-grid">
+                <div class="admin-lista-box">
+                    <div class="catalogo-encabezado">
+                        <h3>📦 Inventario de Productos</h3>
+                        <button id="btn-nuevo-producto" class="btn-nuevo-prod" type="button">+ Nuevo Producto</button>
+                    </div>
+
+                    <div class="filtros-inventario-admin">
+                        <input
+                            type="search"
+                            id="input-buscar-prod-admin"
+                            class="input-buscar"
+                            placeholder="🔍 Buscar producto en inventario..."
+                        >
+                        <select id="filtro-cat-admin" class="select-input select-filtro-cat">
+                            <option value="todos">Todas las categorías</option>
+                        </select>
+                    </div>
+
+                    <p id="admin-prod-mensaje" class="admin-feedback"></p>
+
+                    <div id="lista-productos-admin" class="lista-productos-admin"></div>
                 </div>
 
-                <!-- Formulario para editar datos personales y rol del usuario -->
-                <div id="card-admin-editar" class="oculto">
-                    <h3>✏️ Editar Datos del Usuario</h3>
-                    <form id="form-admin-editar" class="auth-form" novalidate>
-                        <input type="hidden" id="admin-edit-id">
+                <!-- Editor para crear o modificar producto, precio, categoría e imagen real -->
+                <aside class="admin-accion-box">
+                    <h3 id="titulo-form-producto">➕ Agregar Nuevo Producto</h3>
 
-                        <div class="form-grupo">
-                            <label for="admin-edit-nombre">Nombre Completo:</label>
-                            <input type="text" id="admin-edit-nombre">
-                            <small class="error" id="error-admin-edit-nombre"></small>
+                    <form id="form-admin-producto" class="auth-form" novalidate>
+                        <input type="hidden" id="prod-edit-id">
+
+                        <div class="preview-imagen-box">
+                            <img id="prod-preview-img" src="img/audifonos.jpg" alt="Vista previa del producto">
+                            <span id="prod-preview-label" class="preview-label">Vista previa de la imagen</span>
                         </div>
 
                         <div class="form-grupo">
-                            <label for="admin-edit-telefono">Teléfono / Celular (10 dígitos):</label>
-                            <input type="tel" id="admin-edit-telefono">
-                            <small class="error" id="error-admin-edit-telefono"></small>
+                            <label for="prod-nombre">Nombre del Producto:</label>
+                            <input type="text" id="prod-nombre" placeholder="Ej. Monitor Gamer 27 pulgadas">
+                            <small class="error" id="error-prod-nombre"></small>
+                        </div>
+
+                        <div class="form-fila-doble">
+                            <div class="form-grupo">
+                                <label for="prod-precio">Precio ($):</label>
+                                <input type="number" id="prod-precio" min="1" step="0.01" placeholder="Ej. 150">
+                                <small class="error" id="error-prod-precio"></small>
+                            </div>
+
+                            <div class="form-grupo">
+                                <label for="prod-categoria">Categoría:</label>
+                                <select id="prod-categoria" class="select-input"></select>
+                                <small class="error" id="error-prod-categoria"></small>
+                            </div>
                         </div>
 
                         <div class="form-grupo">
-                            <label for="admin-edit-direccion">Dirección de Envío:</label>
-                            <input type="text" id="admin-edit-direccion">
-                            <small class="error" id="error-admin-edit-direccion"></small>
+                            <label for="prod-descripcion">Descripción:</label>
+                            <textarea id="prod-descripcion" class="textarea-input" rows="2" placeholder="Describe las características principales del producto..."></textarea>
+                            <small class="error" id="error-prod-descripcion"></small>
                         </div>
 
                         <div class="form-grupo">
-                            <label for="admin-edit-email">Correo Electrónico:</label>
-                            <input type="email" id="admin-edit-email">
-                            <small class="error" id="error-admin-edit-email"></small>
+                            <label for="prod-archivo-imagen">📷 Subir Imagen Real desde tu PC (opcional):</label>
+                            <input type="file" id="prod-archivo-imagen" class="input-archivo" accept="image/*">
                         </div>
 
                         <div class="form-grupo">
-                            <label for="admin-edit-rol">Rol en la Plataforma:</label>
-                            <select id="admin-edit-rol" class="select-input">
-                                <option value="cliente">👤 Cliente</option>
-                                <option value="admin">👑 Administrador</option>
-                            </select>
+                            <label for="prod-url-imagen">🔗 O Ruta / URL de Imagen:</label>
+                            <input type="text" id="prod-url-imagen" placeholder="Ej. https://... o img/audifonos.jpg">
+                            <small class="error" id="error-prod-url-imagen"></small>
                         </div>
 
                         <div class="admin-form-botones">
-                            <button type="submit" class="btn-primary">Guardar Cambios</button>
-                            <button type="button" id="btn-cancelar-editar" class="btn-secundario">Cancelar</button>
+                            <button type="submit" id="btn-guardar-producto" class="btn-primary">Guardar Producto</button>
+                            <button type="button" id="btn-cancelar-producto" class="btn-secundario">Limpiar</button>
                         </div>
                     </form>
+                </aside>
+            </div>
+        </div>
+
+        <!-- MÓDULO ADMIN 2: GESTIÓN DE USUARIOS Y RECUPERACIÓN DE CONTRASEÑAS -->
+        <div id="subvista-admin-usuarios" class="oculto">
+            <div class="admin-grid">
+                <div class="admin-lista-box">
+                    <div class="catalogo-encabezado">
+                        <h3>👥 Directorio de Cuentas</h3>
+                        <span id="contador-usuarios-admin" class="contador-resultados"></span>
+                    </div>
+
+                    <input
+                        type="search"
+                        id="input-buscar-usuario"
+                        class="input-buscar"
+                        placeholder="🔍 Buscar usuario por nombre, correo o teléfono..."
+                    >
+
+                    <p id="admin-lista-mensaje" class="admin-feedback"></p>
+
+                    <div id="lista-usuarios-admin" class="lista-usuarios-admin"></div>
                 </div>
 
-                <!-- Formulario para restablecer/cambiar contraseña en caso de olvido -->
-                <div id="card-admin-password" class="oculto">
-                    <h3>🔑 Restablecer Contraseña</h3>
-                    <p id="admin-pass-usuario-info" class="admin-pass-info"></p>
+                <aside class="admin-accion-box">
+                    <div id="admin-panel-vacio" class="admin-panel-vacio">
+                        <span class="admin-icono-guia">⚙️</span>
+                        <h3>Gestión de Cuenta</h3>
+                        <p>Selecciona <strong>Editar Datos</strong> para modificar la información o el rol de una persona, o <strong>Cambiar Clave</strong> si olvidó su contraseña.</p>
+                    </div>
 
-                    <form id="form-admin-password" class="auth-form" novalidate>
-                        <input type="hidden" id="admin-pass-id">
+                    <!-- Formulario para editar datos personales y rol del usuario -->
+                    <div id="card-admin-editar" class="oculto">
+                        <h3>✏️ Editar Datos del Usuario</h3>
+                        <form id="form-admin-editar" class="auth-form" novalidate>
+                            <input type="hidden" id="admin-edit-id">
 
-                        <div class="form-grupo">
-                            <label for="admin-nueva-password">Nueva Contraseña (mín. 8 caracteres):</label>
-                            <input type="password" id="admin-nueva-password" placeholder="Escribe la nueva contraseña">
-                            <small class="error" id="error-admin-nueva-password"></small>
-                        </div>
+                            <div class="form-grupo">
+                                <label for="admin-edit-nombre">Nombre Completo:</label>
+                                <input type="text" id="admin-edit-nombre">
+                                <small class="error" id="error-admin-edit-nombre"></small>
+                            </div>
 
-                        <div class="form-grupo">
-                            <label for="admin-confirmar-password">Confirmar Nueva Contraseña:</label>
-                            <input type="password" id="admin-confirmar-password" placeholder="Confirma la nueva contraseña">
-                            <small class="error" id="error-admin-confirmar-password"></small>
-                        </div>
+                            <div class="form-grupo">
+                                <label for="admin-edit-telefono">Teléfono / Celular (10 dígitos):</label>
+                                <input type="tel" id="admin-edit-telefono">
+                                <small class="error" id="error-admin-edit-telefono"></small>
+                            </div>
 
-                        <label class="check-mostrar-clave">
-                            <input type="checkbox" id="check-ver-clave-admin">
-                            Mostrar contraseñas escritas
-                        </label>
+                            <div class="form-grupo">
+                                <label for="admin-edit-direccion">Dirección de Envío:</label>
+                                <input type="text" id="admin-edit-direccion">
+                                <small class="error" id="error-admin-edit-direccion"></small>
+                            </div>
 
-                        <div class="admin-form-botones">
-                            <button type="submit" class="btn-primary">Actualizar Contraseña</button>
-                            <button type="button" id="btn-cancelar-password" class="btn-secundario">Cancelar</button>
-                        </div>
-                    </form>
-                </div>
-            </aside>
+                            <div class="form-grupo">
+                                <label for="admin-edit-email">Correo Electrónico:</label>
+                                <input type="email" id="admin-edit-email">
+                                <small class="error" id="error-admin-edit-email"></small>
+                            </div>
+
+                            <div class="form-grupo">
+                                <label for="admin-edit-rol">Rol en la Plataforma:</label>
+                                <select id="admin-edit-rol" class="select-input">
+                                    <option value="cliente">👤 Cliente</option>
+                                    <option value="admin">👑 Administrador</option>
+                                </select>
+                            </div>
+
+                            <div class="admin-form-botones">
+                                <button type="submit" class="btn-primary">Guardar Cambios</button>
+                                <button type="button" id="btn-cancelar-editar" class="btn-secundario">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Formulario para restablecer/cambiar contraseña en caso de olvido -->
+                    <div id="card-admin-password" class="oculto">
+                        <h3>🔑 Restablecer Contraseña</h3>
+                        <p id="admin-pass-usuario-info" class="admin-pass-info"></p>
+
+                        <form id="form-admin-password" class="auth-form" novalidate>
+                            <input type="hidden" id="admin-pass-id">
+
+                            <div class="form-grupo">
+                                <label for="admin-nueva-password">Nueva Contraseña (mín. 8 caracteres):</label>
+                                <input type="password" id="admin-nueva-password" placeholder="Escribe la nueva contraseña">
+                                <small class="error" id="error-admin-nueva-password"></small>
+                            </div>
+
+                            <div class="form-grupo">
+                                <label for="admin-confirmar-password">Confirmar Nueva Contraseña:</label>
+                                <input type="password" id="admin-confirmar-password" placeholder="Confirma la nueva contraseña">
+                                <small class="error" id="error-admin-confirmar-password"></small>
+                            </div>
+
+                            <label class="check-mostrar-clave">
+                                <input type="checkbox" id="check-ver-clave-admin">
+                                Mostrar contraseñas escritas
+                            </label>
+
+                            <div class="admin-form-botones">
+                                <button type="submit" class="btn-primary">Actualizar Contraseña</button>
+                                <button type="button" id="btn-cancelar-password" class="btn-secundario">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </aside>
+            </div>
         </div>
     </section>
 
@@ -368,6 +442,6 @@
         <p>Desarrollado por <strong>Lysney Simancas Segovia</strong> y <strong>Jesús Contreras</strong></p>
     </footer>
 
-    <script src="js/app.js?v=6"></script>
+    <script src="js/app.js?v=7"></script>
 </body>
 </html>
