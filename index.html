@@ -3,45 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Tienda Web - Carrito y Usuarios</title>
-    <link rel="stylesheet" href="css/style.css?v=4">
+    <title>TechNova Store | Aplicación Web Interactiva</title>
+    <link rel="stylesheet" href="css/style.css?v=5">
 </head>
 <body>
     <header>
-        <div class="brand">
-            <h1>Mi Tienda Web</h1>
-        </div>
-
-        <div id="user-header-info" class="user-header-info oculto">
-            <div class="user-text">
-                <span class="user-saludo">Bienvenido(a), <strong id="user-name"></strong></span>
-                <span class="user-datos" id="user-datos"></span>
+        <div class="header-top">
+            <div class="brand">
+                <h1>🛒 TechNova Web Store</h1>
+                <span class="brand-sub">Aplicación Web Interactiva</span>
             </div>
-            <button id="btn-logout" class="btn-logout">Cerrar Sesión</button>
+
+            <button id="btn-menu" class="btn-menu" type="button" aria-label="Abrir menú">
+                ☰ Menú
+            </button>
         </div>
 
-        <div class="header-acciones">
-            <button id="btn-theme">Modo Oscuro</button>
-        </div>
+        <nav id="nav-panel" class="nav-panel">
+            <div id="user-header-info" class="user-header-info oculto">
+                <div class="user-text">
+                    <span class="user-saludo">Hola, <strong id="user-name"></strong></span>
+                    <span class="user-datos" id="user-datos"></span>
+                </div>
+                <span class="badge-carrito" title="Artículos en el carrito">
+                    🛍️ <span id="header-contador-carrito">0</span>
+                </span>
+                <button id="btn-logout" class="btn-logout" type="button">Cerrar Sesión</button>
+            </div>
+
+            <div class="header-acciones">
+                <button id="btn-theme" type="button">🌙 Modo Oscuro</button>
+            </div>
+        </nav>
     </header>
 
     <section id="seccion-auth" class="auth-container">
         <div class="auth-card">
-            <h2>Acceso a la Tienda</h2>
+            <h2>Acceso de Clientes</h2>
+            <p class="auth-subtitulo">Inicia sesión o crea tu cuenta para gestionar tu carrito y pedidos</p>
 
             <div class="auth-tabs">
                 <button id="tab-login" class="tab-btn activo" type="button">Iniciar Sesión</button>
                 <button id="tab-registro" class="tab-btn" type="button">Registrarse</button>
             </div>
 
-            <!-- Formulario de Inicio de Sesión con validación personalizada en JS -->
+            <!-- Formulario de Inicio de Sesión -->
             <form id="form-login" class="auth-form" novalidate>
                 <div class="demo-box">
-                    <p><strong>👥 Usuarios Demo del Equipo:</strong></p>
-                    <p>Clave demo: <code>Demo12345</code></p>
+                    <p><strong>👥 Acceso Rápido — Cuentas Demo:</strong></p>
+                    <p>Contraseña demo: <code>Demo12345</code></p>
                     <div class="demo-botones">
-                        <button type="button" id="btn-autofill-jesus" class="btn-demo">Usar cuenta de Jesús Contreras</button>
-                        <button type="button" id="btn-autofill-lysney" class="btn-demo btn-demo-alt">Usar cuenta de Lysney Simancas</button>
+                        <button type="button" id="btn-autofill-jesus" class="btn-demo">Jesús Contreras</button>
+                        <button type="button" id="btn-autofill-lysney" class="btn-demo btn-demo-alt">Lysney Simancas</button>
                     </div>
                 </div>
 
@@ -58,7 +71,7 @@
                 <button type="submit" class="btn-primary">Ingresar a la Tienda</button>
             </form>
 
-            <!-- Formulario de Registro de Clientes con validación JS y expresiones regulares -->
+            <!-- Formulario de Registro con validación JS y expresiones regulares -->
             <form id="form-registro" class="auth-form oculto" novalidate>
                 <div class="form-grupo">
                     <label for="reg-nombre">Nombre Completo:</label>
@@ -98,38 +111,121 @@
     </section>
 
     <main id="seccion-tienda" class="oculto">
-        <section class="productos">
-            <h2>Productos Disponibles</h2>
-            <div class="grid-productos">
-                <div class="producto">
-                    <h3>Producto A</h3>
-                    <p>Precio: $10</p>
-                    <button class="btn-agregar" data-id="1" data-nombre="Producto A" data-precio="10">Agregar al Carrito</button>
+        <div class="columna-principal">
+            <section class="productos">
+                <div class="catalogo-encabezado">
+                    <h2>Catálogo de Productos</h2>
+                    <span id="contador-resultados" class="contador-resultados">Mostrando 6 productos</span>
                 </div>
-                <div class="producto">
-                    <h3>Producto B</h3>
-                    <p>Precio: $20</p>
-                    <button class="btn-agregar" data-id="2" data-nombre="Producto B" data-precio="20">Agregar al Carrito</button>
-                </div>
-                <div class="producto">
-                    <h3>Producto C</h3>
-                    <p>Precio: $30</p>
-                    <button class="btn-agregar" data-id="3" data-nombre="Producto C" data-precio="30">Agregar al Carrito</button>
-                </div>
-            </div>
-        </section>
 
-        <section class="carrito">
-            <h2>Mi Carrito</h2>
-            <div id="lista-carrito">
+                <!-- Controles interactivos de búsqueda y filtrado -->
+                <div class="controles-catalogo">
+                    <input
+                        type="search"
+                        id="input-buscar"
+                        class="input-buscar"
+                        placeholder="🔍 Buscar producto por nombre o descripción..."
+                    >
+                    <div class="filtros-categoria">
+                        <button type="button" class="btn-filtro activo" data-filtro="todos">Todos</button>
+                        <button type="button" class="btn-filtro" data-filtro="Periféricos">Periféricos</button>
+                        <button type="button" class="btn-filtro" data-filtro="Audio">Audio</button>
+                        <button type="button" class="btn-filtro" data-filtro="Accesorios">Accesorios</button>
+                    </div>
+                </div>
+
+                <div id="grid-productos" class="grid-productos">
+                    <article class="producto" data-categoria="Audio">
+                        <span class="producto-icono">🎧</span>
+                        <span class="producto-tag">Audio</span>
+                        <h3>Audífonos Bluetooth ANC</h3>
+                        <p class="producto-desc">Cancelación activa de ruido y batería de 30 horas.</p>
+                        <p class="producto-precio">$85</p>
+                        <button class="btn-agregar" data-id="1" data-nombre="Audífonos Bluetooth ANC" data-precio="85">Agregar al Carrito</button>
+                    </article>
+
+                    <article class="producto" data-categoria="Periféricos">
+                        <span class="producto-icono">⌨️</span>
+                        <span class="producto-tag">Periféricos</span>
+                        <h3>Teclado Mecánico RGB</h3>
+                        <p class="producto-desc">Switches táctiles silenciosos e iluminación personalizable.</p>
+                        <p class="producto-precio">$120</p>
+                        <button class="btn-agregar" data-id="2" data-nombre="Teclado Mecánico RGB" data-precio="120">Agregar al Carrito</button>
+                    </article>
+
+                    <article class="producto" data-categoria="Periféricos">
+                        <span class="producto-icono">🖱️</span>
+                        <span class="producto-tag">Periféricos</span>
+                        <h3>Mouse Inalámbrico Pro</h3>
+                        <p class="producto-desc">Sensor óptico de alta precisión y diseño ergonómico.</p>
+                        <p class="producto-precio">$45</p>
+                        <button class="btn-agregar" data-id="3" data-nombre="Mouse Inalámbrico Pro" data-precio="45">Agregar al Carrito</button>
+                    </article>
+
+                    <article class="producto" data-categoria="Accesorios">
+                        <span class="producto-icono">📷</span>
+                        <span class="producto-tag">Accesorios</span>
+                        <h3>Webcam Full HD 1080p</h3>
+                        <p class="producto-desc">Micrófono estéreo integrado y enfoque automático.</p>
+                        <p class="producto-precio">$65</p>
+                        <button class="btn-agregar" data-id="4" data-nombre="Webcam Full HD 1080p" data-precio="65">Agregar al Carrito</button>
+                    </article>
+
+                    <article class="producto" data-categoria="Audio">
+                        <span class="producto-icono">🔊</span>
+                        <span class="producto-tag">Audio</span>
+                        <h3>Parlante Portátil Smart</h3>
+                        <p class="producto-desc">Sonido envolvente 360° resistente a salpicaduras.</p>
+                        <p class="producto-precio">$70</p>
+                        <button class="btn-agregar" data-id="5" data-nombre="Parlante Portátil Smart" data-precio="70">Agregar al Carrito</button>
+                    </article>
+
+                    <article class="producto" data-categoria="Accesorios">
+                        <span class="producto-icono">💻</span>
+                        <span class="producto-tag">Accesorios</span>
+                        <h3>Base Refrigerante Laptop</h3>
+                        <p class="producto-desc">Doble ventilador silencioso y altura ajustable en 5 niveles.</p>
+                        <p class="producto-precio">$35</p>
+                        <button class="btn-agregar" data-id="6" data-nombre="Base Refrigerante Laptop" data-precio="35">Agregar al Carrito</button>
+                    </article>
+                </div>
+
+                <p id="sin-resultados" class="carrito-vacio oculto">
+                    No se encontraron productos que coincidan con tu búsqueda.
+                </p>
+            </section>
+
+            <section class="historial-pedidos">
+                <h2>📦 Mis Pedidos Realizados</h2>
+                <div id="lista-pedidos"></div>
+            </section>
+        </div>
+
+        <aside class="carrito">
+            <div class="carrito-encabezado">
+                <h2>Mi Carrito</h2>
+                <span class="carrito-resumen-items"><span id="cantidad-total-items">0</span> artículo(s)</span>
             </div>
+
+            <div id="lista-carrito"></div>
+
+            <p id="carrito-mensaje" class="carrito-mensaje"></p>
+
             <div class="carrito-footer">
-                <p>Total: $<span id="total-carrito">0</span></p>
-                <button id="btn-vaciar">Vaciar Carrito</button>
+                <p class="total-linea">Total a pagar: $<span id="total-carrito">0</span></p>
+                <div class="carrito-acciones">
+                    <button id="btn-comprar" class="btn-comprar" type="button">Finalizar Compra</button>
+                    <button id="btn-vaciar" type="button">Vaciar Carrito</button>
+                </div>
             </div>
-        </section>
+        </aside>
     </main>
 
-    <script src="js/app.js?v=4"></script>
+    <footer>
+        <p><strong>PRAI 3: Actividad Final</strong> — Desarrollo Web II (IC05)</p>
+        <p>Desarrollado por <strong>Jesús Contreras</strong> y <strong>Lysney Simancas Segovia</strong></p>
+    </footer>
+
+    <script src="js/app.js?v=5"></script>
 </body>
 </html>

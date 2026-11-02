@@ -1,11 +1,34 @@
+// =========================================================================
+// 1. INTERFAZ: MODO CLARO / OSCURO (CON PERSISTENCIA) Y MENÚ RESPONSIVE
+// =========================================================================
 const btnTheme = document.getElementById('btn-theme');
+const btnMenu = document.getElementById('btn-menu');
+const navPanel = document.getElementById('nav-panel');
 const body = document.body;
 
+function aplicarTema(modoOscuro) {
+    body.classList.toggle('dark-mode', modoOscuro);
+    btnTheme.textContent = modoOscuro ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
+}
+
+const temaGuardado = localStorage.getItem('tienda_tema') === 'oscuro';
+aplicarTema(temaGuardado);
+
 btnTheme.addEventListener('click', () => {
-    body.classList.toggle('dark-mode');
-    btnTheme.textContent = body.classList.contains('dark-mode') ? 'Modo Claro' : 'Modo Oscuro';
+    const activo = !body.classList.contains('dark-mode');
+    aplicarTema(activo);
+    localStorage.setItem('tienda_tema', activo ? 'oscuro' : 'claro');
 });
 
+if (btnMenu && navPanel) {
+    btnMenu.addEventListener('click', () => {
+        navPanel.classList.toggle('abierto');
+    });
+}
+
+// =========================================================================
+// 2. REFERENCIAS DEL DOM Y USUARIOS INICIALES EN LOCALSTORAGE
+// =========================================================================
 const seccionAuth = document.getElementById('seccion-auth');
 const seccionTienda = document.getElementById('seccion-tienda');
 const userHeaderInfo = document.getElementById('user-header-info');
@@ -26,7 +49,6 @@ const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const REGEX_TELEFONO = /^\d{10}$/;
 const REGEX_NOMBRE = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]{3,60}$/;
 
-// Usuarios demo iniciales del equipo
 const usuariosDemo = [
     {
         id: 1,
@@ -36,8 +58,9 @@ const usuariosDemo = [
         direccion: "Avenida Principal 123",
         password: "Demo12345",
         carrito: [
-            { id: "1", nombre: "Producto A", precio: 10 }
-        ]
+            { id: "1", nombre: "Audífonos Bluetooth ANC", precio: 85, cantidad: 1 }
+        ],
+        pedidos: []
     },
     {
         id: 2,
@@ -46,13 +69,35 @@ const usuariosDemo = [
         email: "lysney.simancas@correo.com",
         direccion: "Calle 45 # 12-30",
         password: "Demo12345",
-        carrito: []
+        carrito: [
+            { id: "2", nombre: "Teclado Mecánico RGB", precio: 120, cantidad: 1 }
+        ],
+        pedidos: []
     }
 ];
 
+function normalizarCarrito(carrito = []) {
+    const mapa = new Map();
+    carrito.forEach((item) => {
+        const id = String(item.id);
+        const cantidad = Number(item.cantidad) > 0 ? Number(item.cantidad) : 1;
+        const precio = Number(item.precio) || 0;
+        if (mapa.has(id)) {
+            mapa.get(id).cantidad += cantidad;
+        } else {
+            mapa.set(id, {
+                id,
+                nombre: item.nombre === 'Producto A' ? 'Audífonos Bluetooth ANC' : item.nombre,
+                precio: item.nombre === 'Producto A' ? 85 : precio,
+                cantidad
+            });
+        }
+    });
+    return Array.from(mapa.values());
+}
+
 let usuarios = JSON.parse(localStorage.getItem('tienda_usuarios')) || [];
 
-// Garantizar que las cuentas demo del equipo existan y estén actualizadas
 usuariosDemo.forEach((demo) => {
     const existente = usuarios.find(u => u.email === demo.email);
     if (!existente) {
@@ -60,14 +105,32 @@ usuariosDemo.forEach((demo) => {
     } else {
         if (!existente.telefono) existente.telefono = demo.telefono;
         if (!existente.direccion) existente.direccion = demo.direccion;
-        if (existente.password === "123") existente.password = demo.password;
+        if (existente.password === '123') existente.password = demo.password;
+        existente.carrito = normalizarCarrito(existente.carrito);
+        if (!Array.isArray(existente.pedidos)) existente.pedidos = [];
     }
 });
+
+usuarios = usuarios.map(u => ({
+    ...u,
+    carrito: normalizarCarrito(u.carrito),
+    pedidos: Array.isArray(u.pedidos) ? u.pedidos : []
+}));
 localStorage.setItem('tienda_usuarios', JSON.stringify(usuarios));
 
 let usuarioActivo = JSON.parse(localStorage.getItem('tienda_usuario_activo')) || null;
+if (usuarioActivo) {
+    const actualizado = usuarios.find(u => u.email === usuarioActivo.email);
+    usuarioActivo = actualizado || {
+        ...usuarioActivo,
+        carrito: normalizarCarrito(usuarioActivo.carrito),
+        pedidos: Array.isArray(usuarioActivo.pedidos) ? usuarioActivo.pedidos : []
+    };
+}
 
-// Funciones reutilizables de validación de formularios
+// =========================================================================
+// 3. FUNCIONES REUTILIZABLES DE VALIDACIÓN DE FORMULARIOS (TIEMPO REAL)
+// =========================================================================
 function mostrarError(campo, mensaje, elementoError) {
     campo.classList.add('invalido');
     campo.classList.remove('valido');
@@ -123,7 +186,6 @@ function validarCampo(regla) {
     return true;
 }
 
-// Reglas declarativas para Login y Registro
 const reglasLogin = [
     {
         id: 'login-email',
@@ -193,7 +255,6 @@ const reglasRegistro = [
     }
 ];
 
-// Conectar validación en tiempo real en cada campo
 [...reglasLogin, ...reglasRegistro].forEach((regla) => {
     const campo = document.getElementById(regla.id);
     if (!campo) return;
@@ -211,21 +272,24 @@ const reglasRegistro = [
     campo.addEventListener('blur', () => validarCampo(regla));
 });
 
-function rellenarDemo(usuario) {
-    const inputEmail = document.getElementById('login-email');
-    const inputPassword = document.getElementById('login-password');
-    inputEmail.value = usuario.email;
-    inputPassword.value = usuario.password;
+// =========================================================================
+// 4. AUTENTICACIÓN, REGISTRO Y SESIÓN DE CLIENTES
+// =========================================================================
+function rellenarDemo(emailDemo) {
+    const usuario = usuarios.find(u => u.email === emailDemo);
+    if (!usuario) return;
+    document.getElementById('login-email').value = usuario.email;
+    document.getElementById('login-password').value = usuario.password;
     reglasLogin.forEach(regla => validarCampo(regla));
-    mostrarMensaje(`Datos de ${usuario.nombre} cargados. Haz clic en Ingresar.`, 'exito');
+    mostrarMensaje(`Cuenta demo de ${usuario.nombre} lista. Haz clic en Ingresar.`, 'exito');
 }
 
 if (btnAutofillJesus) {
-    btnAutofillJesus.addEventListener('click', () => rellenarDemo(usuariosDemo[0]));
+    btnAutofillJesus.addEventListener('click', () => rellenarDemo('jdcontrerast@gmail.com'));
 }
 
 if (btnAutofillLysney) {
-    btnAutofillLysney.addEventListener('click', () => rellenarDemo(usuariosDemo[1]));
+    btnAutofillLysney.addEventListener('click', () => rellenarDemo('lysney.simancas@correo.com'));
 }
 
 tabLogin.addEventListener('click', () => {
@@ -279,7 +343,8 @@ formRegistro.addEventListener('submit', (e) => {
         direccion,
         email,
         password,
-        carrito: []
+        carrito: [],
+        pedidos: []
     };
 
     usuarios.push(nuevoUsuario);
@@ -294,7 +359,7 @@ formRegistro.addEventListener('submit', (e) => {
         const loginEmail = document.getElementById('login-email');
         loginEmail.value = email;
         validarCampo(reglasLogin[0]);
-    }, 1200);
+    }, 1100);
 });
 
 formLogin.addEventListener('submit', (e) => {
@@ -331,10 +396,12 @@ function iniciarSesion(usuario) {
     userDatos.textContent = `📞 ${usuarioActivo.telefono || 'Sin teléfono'} | 📧 ${usuarioActivo.email} | 📍 ${usuarioActivo.direccion || 'Sin dirección'}`;
 
     limpiarMensaje();
+    limpiarMensajeCarrito();
     formLogin.reset();
     limpiarEstadoFormulario(formLogin);
 
     renderizarCarrito();
+    renderizarPedidos();
 }
 
 btnLogout.addEventListener('click', () => {
@@ -344,6 +411,7 @@ btnLogout.addEventListener('click', () => {
     seccionTienda.classList.add('oculto');
     userHeaderInfo.classList.add('oculto');
     seccionAuth.classList.remove('oculto');
+    if (navPanel) navPanel.classList.remove('abierto');
 
     tabLogin.click();
 });
@@ -362,74 +430,213 @@ function limpiarMensaje() {
     authMensaje.className = '';
 }
 
+// =========================================================================
+// 5. BÚSQUEDA Y FILTRADO INTERACTIVO DEL CATÁLOGO (DOM EN TIEMPO REAL)
+// =========================================================================
+const inputBuscar = document.getElementById('input-buscar');
+const botonesFiltro = document.querySelectorAll('.btn-filtro');
+const tarjetasProducto = document.querySelectorAll('.producto');
+const contadorResultados = document.getElementById('contador-resultados');
+const sinResultados = document.getElementById('sin-resultados');
+
+let categoriaSeleccionada = 'todos';
+
+function filtrarCatalogo() {
+    const termino = (inputBuscar ? inputBuscar.value : '').trim().toLowerCase();
+    let visibles = 0;
+
+    tarjetasProducto.forEach((tarjeta) => {
+        const categoria = tarjeta.getAttribute('data-categoria');
+        const textoTarjeta = tarjeta.textContent.toLowerCase();
+
+        const coincideCategoria = categoriaSeleccionada === 'todos' || categoria === categoriaSeleccionada;
+        const coincideBusqueda = termino === '' || textoTarjeta.includes(termino);
+
+        if (coincideCategoria && coincideBusqueda) {
+            tarjeta.classList.remove('oculto');
+            visibles++;
+        } else {
+            tarjeta.classList.add('oculto');
+        }
+    });
+
+    if (contadorResultados) {
+        contadorResultados.textContent = `Mostrando ${visibles} producto${visibles === 1 ? '' : 's'}`;
+    }
+
+    if (sinResultados) {
+        sinResultados.classList.toggle('oculto', visibles > 0);
+    }
+}
+
+if (inputBuscar) {
+    inputBuscar.addEventListener('input', filtrarCatalogo);
+}
+
+botonesFiltro.forEach((boton) => {
+    boton.addEventListener('click', () => {
+        botonesFiltro.forEach(b => b.classList.remove('activo'));
+        boton.classList.add('activo');
+        categoriaSeleccionada = boton.getAttribute('data-filtro');
+        filtrarCatalogo();
+    });
+});
+
+// =========================================================================
+// 6. CARRITO DE COMPRAS DINÁMICO Y FINALIZACIÓN DE PEDIDOS
+// =========================================================================
 const listaCarrito = document.getElementById('lista-carrito');
 const contenedorTotal = document.getElementById('total-carrito');
+const cantidadTotalItems = document.getElementById('cantidad-total-items');
+const headerContadorCarrito = document.getElementById('header-contador-carrito');
 const btnVaciar = document.getElementById('btn-vaciar');
+const btnComprar = document.getElementById('btn-comprar');
+const carritoMensaje = document.getElementById('carrito-mensaje');
+const listaPedidos = document.getElementById('lista-pedidos');
 
 const botonesAgregar = document.querySelectorAll('.btn-agregar');
-botonesAgregar.forEach(boton => {
+botonesAgregar.forEach((boton) => {
     boton.addEventListener('click', agregarAlCarrito);
 });
+
+function mostrarMensajeCarrito(texto, tipo) {
+    if (!carritoMensaje) return;
+    carritoMensaje.textContent = texto;
+    carritoMensaje.className = `carrito-mensaje mensaje-${tipo}`;
+}
+
+function limpiarMensajeCarrito() {
+    if (!carritoMensaje) return;
+    carritoMensaje.textContent = '';
+    carritoMensaje.className = 'carrito-mensaje';
+}
 
 function agregarAlCarrito(e) {
     e.preventDefault();
     if (!usuarioActivo) return;
 
-    const boton = e.target;
+    const boton = e.currentTarget;
     const id = boton.getAttribute('data-id');
     const nombre = boton.getAttribute('data-nombre');
     const precio = parseFloat(boton.getAttribute('data-precio'));
 
-    const producto = { id, nombre, precio };
-
-    if (!usuarioActivo.carrito) {
+    if (!Array.isArray(usuarioActivo.carrito)) {
         usuarioActivo.carrito = [];
     }
-    usuarioActivo.carrito.push(producto);
 
+    const existente = usuarioActivo.carrito.find(item => item.id === id);
+    if (existente) {
+        existente.cantidad += 1;
+    } else {
+        usuarioActivo.carrito.push({ id, nombre, precio, cantidad: 1 });
+    }
+
+    sincronizarUsuarioActivo();
+    renderizarCarrito();
+    mostrarMensajeCarrito(`✓ "${nombre}" agregado al carrito.`, 'exito');
+}
+
+function cambiarCantidad(id, cambio) {
+    if (!usuarioActivo || !Array.isArray(usuarioActivo.carrito)) return;
+    const index = usuarioActivo.carrito.findIndex(item => item.id === id);
+    if (index === -1) return;
+
+    usuarioActivo.carrito[index].cantidad += cambio;
+    if (usuarioActivo.carrito[index].cantidad <= 0) {
+        usuarioActivo.carrito.splice(index, 1);
+    }
+
+    limpiarMensajeCarrito();
+    sincronizarUsuarioActivo();
+    renderizarCarrito();
+}
+
+function eliminarProducto(id) {
+    if (!usuarioActivo || !Array.isArray(usuarioActivo.carrito)) return;
+    usuarioActivo.carrito = usuarioActivo.carrito.filter(item => item.id !== id);
+    limpiarMensajeCarrito();
     sincronizarUsuarioActivo();
     renderizarCarrito();
 }
 
 function renderizarCarrito() {
     listaCarrito.innerHTML = '';
-    let total = 0;
+    let totalPrecio = 0;
+    let totalArticulos = 0;
 
     if (!usuarioActivo || !usuarioActivo.carrito || usuarioActivo.carrito.length === 0) {
-        listaCarrito.innerHTML = '<p class="carrito-vacio">Tu carrito está vacío.</p>';
+        const pVacio = document.createElement('p');
+        pVacio.classList.add('carrito-vacio');
+        pVacio.textContent = 'Tu carrito está vacío.';
+        listaCarrito.appendChild(pVacio);
+
         contenedorTotal.textContent = '0';
+        if (cantidadTotalItems) cantidadTotalItems.textContent = '0';
+        if (headerContadorCarrito) headerContadorCarrito.textContent = '0';
         return;
     }
 
-    usuarioActivo.carrito.forEach((producto, index) => {
+    usuarioActivo.carrito.forEach((producto) => {
+        const cantidad = producto.cantidad || 1;
+        const subtotal = producto.precio * cantidad;
+        totalPrecio += subtotal;
+        totalArticulos += cantidad;
+
         const divItem = document.createElement('div');
         divItem.classList.add('item-carrito');
 
-        const pInfo = document.createElement('p');
-        pInfo.textContent = `${producto.nombre} - $${producto.precio}`;
+        const divInfo = document.createElement('div');
+        divInfo.classList.add('item-info');
+
+        const pNombre = document.createElement('p');
+        pNombre.classList.add('item-nombre');
+        pNombre.textContent = producto.nombre;
+
+        const pSubtotal = document.createElement('p');
+        pSubtotal.classList.add('item-subtotal');
+        pSubtotal.textContent = `$${producto.precio} x ${cantidad} = $${subtotal}`;
+
+        divInfo.appendChild(pNombre);
+        divInfo.appendChild(pSubtotal);
+
+        const divControles = document.createElement('div');
+        divControles.classList.add('item-controles');
+
+        const btnMenos = document.createElement('button');
+        btnMenos.type = 'button';
+        btnMenos.classList.add('btn-cantidad');
+        btnMenos.textContent = '−';
+        btnMenos.addEventListener('click', () => cambiarCantidad(producto.id, -1));
+
+        const spanCantidad = document.createElement('span');
+        spanCantidad.classList.add('cantidad-valor');
+        spanCantidad.textContent = String(cantidad);
+
+        const btnMas = document.createElement('button');
+        btnMas.type = 'button';
+        btnMas.classList.add('btn-cantidad');
+        btnMas.textContent = '+';
+        btnMas.addEventListener('click', () => cambiarCantidad(producto.id, 1));
 
         const btnEliminar = document.createElement('button');
+        btnEliminar.type = 'button';
         btnEliminar.classList.add('btn-eliminar');
         btnEliminar.textContent = 'Eliminar';
-        btnEliminar.addEventListener('click', () => {
-            eliminarProducto(index);
-        });
+        btnEliminar.addEventListener('click', () => eliminarProducto(producto.id));
 
-        divItem.appendChild(pInfo);
-        divItem.appendChild(btnEliminar);
+        divControles.appendChild(btnMenos);
+        divControles.appendChild(spanCantidad);
+        divControles.appendChild(btnMas);
+        divControles.appendChild(btnEliminar);
+
+        divItem.appendChild(divInfo);
+        divItem.appendChild(divControles);
         listaCarrito.appendChild(divItem);
-
-        total += producto.precio;
     });
 
-    contenedorTotal.textContent = total;
-}
-
-function eliminarProducto(index) {
-    if (!usuarioActivo) return;
-    usuarioActivo.carrito.splice(index, 1);
-    sincronizarUsuarioActivo();
-    renderizarCarrito();
+    contenedorTotal.textContent = totalPrecio;
+    if (cantidadTotalItems) cantidadTotalItems.textContent = String(totalArticulos);
+    if (headerContadorCarrito) headerContadorCarrito.textContent = String(totalArticulos);
 }
 
 btnVaciar.addEventListener('click', () => {
@@ -437,11 +644,86 @@ btnVaciar.addEventListener('click', () => {
     usuarioActivo.carrito = [];
     sincronizarUsuarioActivo();
     renderizarCarrito();
+    mostrarMensajeCarrito('Carrito vaciado correctamente.', 'error');
 });
+
+if (btnComprar) {
+    btnComprar.addEventListener('click', () => {
+        if (!usuarioActivo || !usuarioActivo.carrito || usuarioActivo.carrito.length === 0) {
+            mostrarMensajeCarrito('Agrega al menos un producto antes de finalizar la compra.', 'error');
+            return;
+        }
+
+        const totalPedido = usuarioActivo.carrito.reduce(
+            (acc, item) => acc + item.precio * (item.cantidad || 1),
+            0
+        );
+        const resumenProductos = usuarioActivo.carrito
+            .map(item => `${item.nombre} (x${item.cantidad || 1})`)
+            .join(', ');
+
+        const nuevoPedido = {
+            folio: `PED-${Date.now().toString().slice(-5)}`,
+            fecha: new Date().toLocaleString('es-CO'),
+            resumen: resumenProductos,
+            total: totalPedido,
+            direccion: usuarioActivo.direccion
+        };
+
+        if (!Array.isArray(usuarioActivo.pedidos)) {
+            usuarioActivo.pedidos = [];
+        }
+        usuarioActivo.pedidos.unshift(nuevoPedido);
+        usuarioActivo.carrito = [];
+
+        sincronizarUsuarioActivo();
+        renderizarCarrito();
+        renderizarPedidos();
+        mostrarMensajeCarrito(`🎉 ¡Compra ${nuevoPedido.folio} confirmada por $${totalPedido}!`, 'exito');
+    });
+}
+
+function renderizarPedidos() {
+    if (!listaPedidos) return;
+    listaPedidos.innerHTML = '';
+
+    if (!usuarioActivo || !Array.isArray(usuarioActivo.pedidos) || usuarioActivo.pedidos.length === 0) {
+        const pSinPedidos = document.createElement('p');
+        pSinPedidos.classList.add('carrito-vacio');
+        pSinPedidos.textContent = 'Aún no has registrado compras. Agrega productos al carrito y pulsa "Finalizar Compra".';
+        listaPedidos.appendChild(pSinPedidos);
+        return;
+    }
+
+    usuarioActivo.pedidos.forEach((pedido) => {
+        const card = document.createElement('div');
+        card.classList.add('pedido-card');
+
+        const encabezado = document.createElement('div');
+        encabezado.classList.add('pedido-encabezado');
+
+        const spanFolio = document.createElement('span');
+        spanFolio.textContent = `Orden ${pedido.folio} — ${pedido.fecha}`;
+
+        const spanTotal = document.createElement('span');
+        spanTotal.textContent = `Total: $${pedido.total}`;
+
+        encabezado.appendChild(spanFolio);
+        encabezado.appendChild(spanTotal);
+
+        const pDetalle = document.createElement('p');
+        pDetalle.classList.add('pedido-detalle');
+        pDetalle.textContent = `Productos: ${pedido.resumen} | Envío a: ${pedido.direccion}`;
+
+        card.appendChild(encabezado);
+        card.appendChild(pDetalle);
+        listaPedidos.appendChild(card);
+    });
+}
 
 function sincronizarUsuarioActivo() {
     localStorage.setItem('tienda_usuario_activo', JSON.stringify(usuarioActivo));
-    const index = usuarios.findIndex(u => u.id === usuarioActivo.id);
+    const index = usuarios.findIndex(u => u.id === usuarioActivo.id || u.email === usuarioActivo.email);
     if (index !== -1) {
         usuarios[index] = usuarioActivo;
         guardarUsuarios();
