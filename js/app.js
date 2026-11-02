@@ -1,6 +1,3 @@
-// =========================================================================
-// 1. INTERFAZ: MODO CLARO / OSCURO (CON PERSISTENCIA) Y MENÚ RESPONSIVE
-// =========================================================================
 const btnTheme = document.getElementById('btn-theme');
 const btnMenu = document.getElementById('btn-menu');
 const navPanel = document.getElementById('nav-panel');
@@ -8,7 +5,7 @@ const body = document.body;
 
 function aplicarTema(modoOscuro) {
     body.classList.toggle('dark-mode', modoOscuro);
-    btnTheme.textContent = modoOscuro ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
+    btnTheme.textContent = modoOscuro ? 'Modo Claro' : 'Modo Oscuro';
 }
 
 const temaGuardado = localStorage.getItem('tienda_tema') === 'oscuro';
@@ -26,9 +23,6 @@ if (btnMenu && navPanel) {
     });
 }
 
-// =========================================================================
-// 2. DATOS INICIALES: CATEGORÍAS, PRODUCTOS CON IMÁGENES REALES Y USUARIOS
-// =========================================================================
 const categoriasIniciales = ['Audio', 'Periféricos', 'Accesorios'];
 
 const productosIniciales = [
@@ -108,7 +102,6 @@ function guardarProductos() {
     localStorage.setItem('tienda_productos', JSON.stringify(productos));
 }
 
-// Referencias principales de vistas y encabezado
 const seccionAuth = document.getElementById('seccion-auth');
 const seccionTienda = document.getElementById('seccion-tienda');
 const seccionAdmin = document.getElementById('seccion-admin');
@@ -128,12 +121,10 @@ const btnAutofillLysney = document.getElementById('btn-autofill-lysney');
 const btnAutofillJesus = document.getElementById('btn-autofill-jesus');
 const btnOlvidoClave = document.getElementById('btn-olvido-clave');
 
-// Expresiones regulares para validación del lado del cliente
 const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const REGEX_TELEFONO = /^\d{10}$/;
 const REGEX_NOMBRE = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]{3,60}$/;
 
-// Cuentas iniciales: Lysney Simancas Segovia (Administradora) y Jesús Contreras (Cliente)
 const usuariosDemo = [
     {
         id: 2,
@@ -236,9 +227,6 @@ if (usuarioActivo) {
     usuarioActivo = actualizado || null;
 }
 
-// =========================================================================
-// 3. FUNCIONES REUTILIZABLES DE VALIDACIÓN DE FORMULARIOS (TIEMPO REAL)
-// =========================================================================
 function mostrarError(campo, mensaje, elementoError) {
     campo.classList.add('invalido');
     campo.classList.remove('valido');
@@ -407,7 +395,7 @@ const reglasProductoAdmin = [
         id: 'prod-url-imagen',
         errorId: 'error-prod-url-imagen',
         requerido: true,
-        mensajeVacio: 'Sube una imagen desde tu PC o ingresa la ruta/URL de la foto.'
+        mensajeVacio: 'Sube una imagen desde el equipo o ingresa la ruta/URL.'
     }
 ];
 
@@ -490,17 +478,14 @@ registrarValidacionTiempoReal(reglasProductoAdmin);
 registrarValidacionTiempoReal(reglasAdminEditar);
 registrarValidacionTiempoReal(reglasAdminPassword, 'admin-nueva-password', 'admin-confirmar-password');
 
-// =========================================================================
-// 4. AUTENTICACIÓN Y SEPARACIÓN ESTRICTA DE ROLES (ADMIN VS CLIENTE)
-// =========================================================================
 function rellenarDemo(emailDemo) {
     const usuario = usuarios.find(u => u.email === emailDemo);
     if (!usuario) return;
     document.getElementById('login-email').value = usuario.email;
     document.getElementById('login-password').value = usuario.password;
     reglasLogin.forEach(regla => validarCampo(regla));
-    const destino = usuario.rol === 'admin' ? 'Consola de Administración' : 'Tienda de Compras';
-    mostrarMensaje(`Cuenta de ${usuario.nombre} lista para entrar a ${destino}.`, 'exito');
+    const destino = usuario.rol === 'admin' ? 'Panel de Administración' : 'Tienda de Compras';
+    mostrarMensaje(`Datos de ${usuario.nombre} cargados para ingresar a ${destino}.`, 'exito');
 }
 
 if (btnAutofillLysney) {
@@ -514,7 +499,7 @@ if (btnAutofillJesus) {
 if (btnOlvidoClave) {
     btnOlvidoClave.addEventListener('click', () => {
         mostrarMensaje(
-            '🔑 Si olvidaste tu clave, ingresa como Administrador (ej. Lysney Simancas) y restablécela en "Usuarios y Contraseñas".',
+            'Si olvidaste tu contraseña, ingresa con una cuenta Administrador (ej. Lysney Simancas) y restablécela en "Usuarios y Contraseñas".',
             'exito'
         );
     });
@@ -579,7 +564,7 @@ formRegistro.addEventListener('submit', (e) => {
     usuarios.push(nuevoUsuario);
     guardarUsuarios();
 
-    mostrarMensaje('¡Cuenta creada con éxito! Redirigiendo a inicio de sesión...', 'exito');
+    mostrarMensaje('Cuenta creada con éxito. Redirigiendo a inicio de sesión...', 'exito');
     formRegistro.reset();
     limpiarEstadoFormulario(formRegistro);
 
@@ -620,16 +605,15 @@ function actualizarEncabezadoUsuario() {
     const esAdmin = usuarioActivo.rol === 'admin';
 
     if (userRolBadge) {
-        userRolBadge.textContent = esAdmin ? '👑 Administradora / Admin' : '👤 Cliente';
+        userRolBadge.textContent = esAdmin ? 'Admin' : 'Cliente';
         userRolBadge.classList.toggle('es-admin', esAdmin);
     }
 
-    // El administrador no compra: ocultamos el ícono del carrito en su barra
     if (headerBadgeCarrito) {
         headerBadgeCarrito.classList.toggle('oculto', esAdmin);
     }
 
-    userDatos.textContent = `📞 ${usuarioActivo.telefono || 'Sin teléfono'} | 📧 ${usuarioActivo.email} | 📍 ${usuarioActivo.direccion || 'Sin dirección'}`;
+    userDatos.textContent = `Tel: ${usuarioActivo.telefono || 'Sin teléfono'} | Correo: ${usuarioActivo.email} | Dir: ${usuarioActivo.direccion || 'Sin dirección'}`;
 }
 
 function iniciarSesion(usuario) {
@@ -646,12 +630,10 @@ function iniciarSesion(usuario) {
     limpiarEstadoFormulario(formLogin);
 
     if (usuarioActivo.rol === 'admin') {
-        // El Administrador entra directamente a la Consola de Administración
         seccionTienda.classList.add('oculto');
         seccionAdmin.classList.remove('oculto');
         activarTabAdmin('productos');
     } else {
-        // El Cliente entra directamente a la Tienda Online y su Carrito
         seccionAdmin.classList.add('oculto');
         seccionTienda.classList.remove('oculto');
         usuarioActivo.carrito = normalizarCarrito(usuarioActivo.carrito);
@@ -687,9 +669,6 @@ function limpiarMensaje() {
     authMensaje.className = '';
 }
 
-// =========================================================================
-// 5. VISTA CLIENTE: CATÁLOGO DINÁMICO, FILTROS Y CARRITO DE COMPRAS
-// =========================================================================
 const inputBuscar = document.getElementById('input-buscar');
 const contenedorFiltrosTienda = document.getElementById('filtros-categoria');
 const gridProductosTienda = document.getElementById('grid-productos');
@@ -815,7 +794,6 @@ if (inputBuscar) {
     inputBuscar.addEventListener('input', renderizarCatalogoTienda);
 }
 
-// Carrito de compras del cliente
 const listaCarrito = document.getElementById('lista-carrito');
 const contenedorTotal = document.getElementById('total-carrito');
 const cantidadTotalItems = document.getElementById('cantidad-total-items');
@@ -861,7 +839,7 @@ function agregarAlCarrito(e) {
 
     sincronizarUsuarioActivo();
     renderizarCarrito();
-    mostrarMensajeCarrito(`✓ "${nombre}" agregado al carrito.`, 'exito');
+    mostrarMensajeCarrito(`"${nombre}" agregado al carrito.`, 'exito');
 }
 
 function cambiarCantidad(id, cambio) {
@@ -1006,7 +984,7 @@ if (btnComprar) {
         sincronizarUsuarioActivo();
         renderizarCarrito();
         renderizarPedidos();
-        mostrarMensajeCarrito(`🎉 ¡Compra ${nuevoPedido.folio} confirmada por $${totalPedido}!`, 'exito');
+        mostrarMensajeCarrito(`Compra ${nuevoPedido.folio} confirmada por $${totalPedido}.`, 'exito');
     });
 }
 
@@ -1057,9 +1035,6 @@ function sincronizarUsuarioActivo() {
     }
 }
 
-// =========================================================================
-// 6. CONSOLA DE ADMINISTRACIÓN: NAVEGACIÓN Y KPIS GLOBALES
-// =========================================================================
 const tabAdminProductos = document.getElementById('tab-admin-productos');
 const tabAdminUsuarios = document.getElementById('tab-admin-usuarios');
 const subvistaAdminProductos = document.getElementById('subvista-admin-productos');
@@ -1118,9 +1093,6 @@ if (tabAdminUsuarios) {
     tabAdminUsuarios.addEventListener('click', () => activarTabAdmin('usuarios'));
 }
 
-// =========================================================================
-// 7. MÓDULO ADMIN 1: GESTIÓN DE PRODUCTOS, PRECIOS, CATEGORÍAS E IMÁGENES
-// =========================================================================
 const formNuevaCategoria = document.getElementById('form-nueva-categoria');
 const inputNuevaCategoria = document.getElementById('input-nueva-categoria');
 const listaCategoriasAdmin = document.getElementById('lista-categorias-admin');
@@ -1234,7 +1206,7 @@ function eliminarCategoriaAdmin(nombreCat) {
     guardarCategorias();
     poblarSelectoresCategoriaAdmin();
     renderizarCategoriasAdmin();
-    mostrarFeedbackCategoria(`✓ Categoría "${nombreCat}" eliminada.`, 'exito');
+    mostrarFeedbackCategoria(`Categoría "${nombreCat}" eliminada.`, 'exito');
 }
 
 if (formNuevaCategoria) {
@@ -1258,7 +1230,7 @@ if (formNuevaCategoria) {
         inputNuevaCategoria.value = '';
         poblarSelectoresCategoriaAdmin();
         renderizarCategoriasAdmin();
-        mostrarFeedbackCategoria(`✓ Categoría "${nueva}" creada y disponible para tus productos.`, 'exito');
+        mostrarFeedbackCategoria(`Categoría "${nueva}" creada correctamente.`, 'exito');
     });
 }
 
@@ -1272,11 +1244,10 @@ if (btnRestaurarCatalogo) {
         renderizarCategoriasAdmin();
         renderizarProductosAdmin();
         prepararNuevoProducto();
-        mostrarFeedbackProducto('✓ Catálogo e imágenes iniciales restaurados correctamente.', 'exito');
+        mostrarFeedbackProducto('Catálogo e imágenes iniciales restaurados correctamente.', 'exito');
     });
 }
 
-// Optimización en Canvas al subir imágenes reales desde la PC (ligeras para localStorage)
 function redimensionarImagenArchivo(archivo) {
     return new Promise((resolve, reject) => {
         const lector = new FileReader();
@@ -1336,7 +1307,7 @@ if (prodArchivoImagen) {
             const dataUrl = await redimensionarImagenArchivo(archivo);
             prodUrlImagen.value = dataUrl;
             validarCampo(reglasProductoAdmin.find(r => r.id === 'prod-url-imagen'));
-            actualizarVistaPreviaProducto(dataUrl, `📷 Imagen cargada: ${archivo.name}`);
+            actualizarVistaPreviaProducto(dataUrl, `Imagen cargada: ${archivo.name}`);
         } catch (err) {
             mostrarFeedbackProducto(err.message, 'error');
         }
@@ -1349,7 +1320,7 @@ if (prodUrlImagen) {
         if (valor !== '') {
             actualizarVistaPreviaProducto(
                 valor,
-                valor.startsWith('data:image') ? '📷 Imagen subida desde tu PC' : '🔗 Vista previa desde ruta/URL'
+                valor.startsWith('data:image') ? 'Imagen cargada desde el equipo' : 'Vista previa desde ruta o URL'
             );
         }
     });
@@ -1361,10 +1332,10 @@ function prepararNuevoProducto() {
     limpiarEstadoFormulario(formAdminProducto);
     prodEditId.value = '';
     poblarSelectoresCategoriaAdmin();
-    if (tituloFormProducto) tituloFormProducto.textContent = '➕ Agregar Nuevo Producto';
+    if (tituloFormProducto) tituloFormProducto.textContent = 'Agregar Nuevo Producto';
     if (btnGuardarProducto) btnGuardarProducto.textContent = 'Guardar Producto';
     if (btnCancelarProducto) btnCancelarProducto.textContent = 'Limpiar';
-    actualizarVistaPreviaProducto(generarPlaceholderSVG('Nuevo Producto'), 'Sube una foto real o pega su URL');
+    actualizarVistaPreviaProducto(generarPlaceholderSVG('Nuevo Producto'), 'Sube una imagen o ingresa su URL');
 }
 
 function cargarProductoParaEditar(idProd) {
@@ -1388,7 +1359,7 @@ function cargarProductoParaEditar(idProd) {
     prodUrlImagen.value = prod.imagen;
     if (prodArchivoImagen) prodArchivoImagen.value = '';
 
-    if (tituloFormProducto) tituloFormProducto.textContent = `✏️ Editando: ${prod.nombre}`;
+    if (tituloFormProducto) tituloFormProducto.textContent = `Editando: ${prod.nombre}`;
     if (btnGuardarProducto) btnGuardarProducto.textContent = 'Actualizar Producto';
     if (btnCancelarProducto) btnCancelarProducto.textContent = 'Cancelar';
 
@@ -1404,7 +1375,6 @@ function eliminarProductoAdmin(idProd) {
     productos.splice(index, 1);
     guardarProductos();
 
-    // Limpiar también de carritos pendientes de clientes
     usuarios.forEach((u) => {
         if (Array.isArray(u.carrito)) {
             u.carrito = u.carrito.filter(item => String(item.id) !== String(idProd));
@@ -1418,7 +1388,7 @@ function eliminarProductoAdmin(idProd) {
 
     renderizarCategoriasAdmin();
     renderizarProductosAdmin();
-    mostrarFeedbackProducto(`✓ Producto "${eliminado.nombre}" eliminado del catálogo.`, 'exito');
+    mostrarFeedbackProducto(`Producto "${eliminado.nombre}" eliminado del catálogo.`, 'exito');
 }
 
 function renderizarProductosAdmin() {
@@ -1497,13 +1467,13 @@ function renderizarProductosAdmin() {
         const btnEditar = document.createElement('button');
         btnEditar.type = 'button';
         btnEditar.classList.add('btn-editar-usr');
-        btnEditar.textContent = '✏️ Editar';
+        btnEditar.textContent = 'Editar';
         btnEditar.addEventListener('click', () => cargarProductoParaEditar(prod.id));
 
         const btnBorrar = document.createElement('button');
         btnBorrar.type = 'button';
         btnBorrar.classList.add('btn-borrar-usr');
-        btnBorrar.textContent = '🗑️ Eliminar';
+        btnBorrar.textContent = 'Eliminar';
         btnBorrar.addEventListener('click', () => eliminarProductoAdmin(prod.id));
 
         divBotones.appendChild(btnEditar);
@@ -1560,7 +1530,6 @@ if (formAdminProducto) {
             if (idx !== -1) {
                 productos[idx] = datosProducto;
             }
-            // Sincronizar nuevo nombre/precio en carritos abiertos de clientes
             usuarios.forEach((u) => {
                 if (Array.isArray(u.carrito)) {
                     u.carrito.forEach((item) => {
@@ -1572,10 +1541,10 @@ if (formAdminProducto) {
                 }
             });
             guardarUsuarios();
-            mostrarFeedbackProducto(`✓ Producto "${datosProducto.nombre}" actualizado con éxito.`, 'exito');
+            mostrarFeedbackProducto(`Producto "${datosProducto.nombre}" actualizado con éxito.`, 'exito');
         } else {
             productos.unshift(datosProducto);
-            mostrarFeedbackProducto(`✓ Nuevo producto "${datosProducto.nombre}" publicado en la tienda.`, 'exito');
+            mostrarFeedbackProducto(`Nuevo producto "${datosProducto.nombre}" publicado en la tienda.`, 'exito');
         }
 
         guardarProductos();
@@ -1585,9 +1554,6 @@ if (formAdminProducto) {
     });
 }
 
-// =========================================================================
-// 8. MÓDULO ADMIN 2: GESTIÓN DE USUARIOS Y RECUPERACIÓN DE CONTRASEÑAS
-// =========================================================================
 const contadorUsuariosAdmin = document.getElementById('contador-usuarios-admin');
 const inputBuscarUsuario = document.getElementById('input-buscar-usuario');
 const listaUsuariosAdmin = document.getElementById('lista-usuarios-admin');
@@ -1702,7 +1668,7 @@ function eliminarUsuarioPorAdmin(idUsuario) {
     guardarUsuarios();
     cerrarFormulariosAdmin();
     renderizarPanelAdmin();
-    mostrarFeedbackAdmin(`✓ La cuenta de "${eliminado.nombre}" fue eliminada correctamente.`, 'exito');
+    mostrarFeedbackAdmin(`La cuenta de "${eliminado.nombre}" fue eliminada correctamente.`, 'exito');
 }
 
 function renderizarPanelAdmin() {
@@ -1749,19 +1715,19 @@ function renderizarPanelAdmin() {
         const spanRol = document.createElement('span');
         const esAdmin = u.rol === 'admin';
         spanRol.className = `tag-rol ${esAdmin ? 'tag-rol-admin' : 'tag-rol-cliente'}`;
-        spanRol.textContent = esAdmin ? '👑 Administrador' : '👤 Cliente';
+        spanRol.textContent = esAdmin ? 'Administrador' : 'Cliente';
 
         divTitulo.appendChild(spanNombre);
         divTitulo.appendChild(spanRol);
 
         const pMeta1 = document.createElement('p');
         pMeta1.classList.add('usuario-admin-meta');
-        pMeta1.textContent = `📧 ${u.email} | 📞 ${u.telefono || 'Sin teléfono'}`;
+        pMeta1.textContent = `Correo: ${u.email} | Tel: ${u.telefono || 'Sin teléfono'}`;
 
         const pMeta2 = document.createElement('p');
         pMeta2.classList.add('usuario-admin-meta');
         const numPedidos = Array.isArray(u.pedidos) ? u.pedidos.length : 0;
-        pMeta2.textContent = `📍 ${u.direccion || 'Sin dirección'} | 📦 Pedidos: ${numPedidos}`;
+        pMeta2.textContent = `Dirección: ${u.direccion || 'Sin dirección'} | Pedidos: ${numPedidos}`;
 
         divInfo.appendChild(divTitulo);
         divInfo.appendChild(pMeta1);
@@ -1773,19 +1739,19 @@ function renderizarPanelAdmin() {
         const btnEditar = document.createElement('button');
         btnEditar.type = 'button';
         btnEditar.classList.add('btn-editar-usr');
-        btnEditar.textContent = '✏️ Editar Datos';
+        btnEditar.textContent = 'Editar Datos';
         btnEditar.addEventListener('click', () => abrirEdicionUsuario(u.id));
 
         const btnClave = document.createElement('button');
         btnClave.type = 'button';
         btnClave.classList.add('btn-clave-usr');
-        btnClave.textContent = '🔑 Cambiar Clave';
+        btnClave.textContent = 'Cambiar Clave';
         btnClave.addEventListener('click', () => abrirCambioPasswordUsuario(u.id));
 
         const btnBorrar = document.createElement('button');
         btnBorrar.type = 'button';
         btnBorrar.classList.add('btn-borrar-usr');
-        btnBorrar.textContent = '🗑️ Eliminar';
+        btnBorrar.textContent = 'Eliminar';
         if (usuarioActivo && String(usuarioActivo.id) === String(u.id)) {
             btnBorrar.disabled = true;
             btnBorrar.title = 'Tu sesión actual está activa';
@@ -1855,7 +1821,6 @@ if (formAdminEditar) {
 
         guardarUsuarios();
 
-        // Si el administrador cambió su propio rol a Cliente, pasar automáticamente a su vista Cliente
         if (String(usuarioActivo.id) === String(idEditar)) {
             usuarioActivo = usuarios[index];
             localStorage.setItem('tienda_usuario_activo', JSON.stringify(usuarioActivo));
@@ -1868,7 +1833,7 @@ if (formAdminEditar) {
 
         cerrarFormulariosAdmin();
         renderizarPanelAdmin();
-        mostrarFeedbackAdmin(`✓ Datos de "${nuevoNombre}" actualizados exitosamente.`, 'exito');
+        mostrarFeedbackAdmin(`Datos de "${nuevoNombre}" actualizados exitosamente.`, 'exito');
     });
 }
 
@@ -1900,7 +1865,7 @@ if (formAdminPassword) {
         const nombreUsuario = usuarios[index].nombre;
         cerrarFormulariosAdmin();
         renderizarPanelAdmin();
-        mostrarFeedbackAdmin(`🔑 Contraseña de "${nombreUsuario}" restablecida correctamente.`, 'exito');
+        mostrarFeedbackAdmin(`Contraseña de "${nombreUsuario}" restablecida correctamente.`, 'exito');
     });
 }
 
