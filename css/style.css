@@ -125,7 +125,7 @@ body.dark-mode .tab-btn.activo {
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 440px;
+    max-width: 460px;
     border: 1px solid #ddd;
     text-align: center;
 }
@@ -133,7 +133,7 @@ body.dark-mode .tab-btn.activo {
 .demo-box {
     background: #e7f3fe;
     border: 1px solid #b8daff;
-    padding: 0.8rem;
+    padding: 0.85rem;
     border-radius: 6px;
     margin-bottom: 1.2rem;
     font-size: 0.85rem;
@@ -145,12 +145,19 @@ body.dark-mode .tab-btn.activo {
     margin: 0.2rem 0;
 }
 
+.demo-botones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 0.5rem;
+}
+
 .btn-demo {
-    margin-top: 0.4rem;
     background-color: #17a2b8;
     color: white;
-    font-size: 0.8rem;
-    padding: 0.35rem 0.7rem;
+    font-size: 0.78rem;
+    padding: 0.4rem 0.65rem;
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -158,6 +165,14 @@ body.dark-mode .tab-btn.activo {
 
 .btn-demo:hover {
     background-color: #138496;
+}
+
+.btn-demo-alt {
+    background-color: #6f42c1;
+}
+
+.btn-demo-alt:hover {
+    background-color: #59339d;
 }
 
 .auth-tabs {
@@ -191,7 +206,7 @@ body.dark-mode .tab-btn.activo {
 }
 
 .form-grupo {
-    margin-bottom: 0.9rem;
+    margin-bottom: 0.85rem;
     display: flex;
     flex-direction: column;
 }
@@ -204,14 +219,40 @@ body.dark-mode .tab-btn.activo {
 
 .form-grupo input {
     padding: 0.6rem;
-    border: 1px solid #ccc;
+    border: 1.5px solid #ccc;
     border-radius: 5px;
     font-size: 0.95rem;
     outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .form-grupo input:focus {
     border-color: #007bff;
+}
+
+/* Estados visuales de validación en tiempo real */
+.form-grupo input.invalido,
+body.dark-mode .form-grupo input.invalido {
+    border-color: #d93025;
+    box-shadow: 0 0 0 2px rgba(217, 48, 37, 0.15);
+}
+
+.form-grupo input.valido,
+body.dark-mode .form-grupo input.valido {
+    border-color: #188038;
+    box-shadow: 0 0 0 2px rgba(24, 128, 56, 0.15);
+}
+
+small.error {
+    color: #d93025;
+    font-size: 0.78rem;
+    min-height: 16px;
+    margin-top: 0.2rem;
+    display: block;
+}
+
+body.dark-mode small.error {
+    color: #ff6b6b;
 }
 
 .btn-primary {
@@ -223,7 +264,7 @@ body.dark-mode .tab-btn.activo {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin-top: 0.5rem;
+    margin-top: 0.4rem;
 }
 
 .btn-primary:hover {
@@ -238,11 +279,11 @@ body.dark-mode .tab-btn.activo {
 }
 
 .mensaje-exito {
-    color: #28a745;
+    color: #188038;
 }
 
 .mensaje-error {
-    color: #dc3545;
+    color: #d93025;
 }
 
 main {
@@ -355,4 +396,18 @@ button:hover {
     font-style: italic;
     text-align: center;
     margin: 1rem 0;
+}
+
+@media (max-width: 500px) {
+    header {
+        padding: 1rem;
+    }
+
+    .auth-card {
+        padding: 1.25rem;
+    }
+
+    main {
+        padding: 1rem;
+    }
 }
