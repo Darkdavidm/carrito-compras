@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechNova Store | Aplicación Web Interactiva</title>
-    <link rel="stylesheet" href="css/style.css?v=5">
+    <link rel="stylesheet" href="css/style.css?v=6">
 </head>
 <body>
     <header>
@@ -22,9 +22,18 @@
         <nav id="nav-panel" class="nav-panel">
             <div id="user-header-info" class="user-header-info oculto">
                 <div class="user-text">
-                    <span class="user-saludo">Hola, <strong id="user-name"></strong></span>
+                    <span class="user-saludo">
+                        Hola, <strong id="user-name"></strong>
+                        <span id="user-rol-badge" class="rol-badge"></span>
+                    </span>
                     <span class="user-datos" id="user-datos"></span>
                 </div>
+
+                <div id="admin-nav-switch" class="admin-nav-switch oculto">
+                    <button id="btn-vista-tienda" class="btn-nav-vista activo" type="button">🛍️ Tienda</button>
+                    <button id="btn-vista-admin" class="btn-nav-vista" type="button">🛠️ Administrar Usuarios</button>
+                </div>
+
                 <span class="badge-carrito" title="Artículos en el carrito">
                     🛍️ <span id="header-contador-carrito">0</span>
                 </span>
@@ -39,8 +48,8 @@
 
     <section id="seccion-auth" class="auth-container">
         <div class="auth-card">
-            <h2>Acceso de Clientes</h2>
-            <p class="auth-subtitulo">Inicia sesión o crea tu cuenta para gestionar tu carrito y pedidos</p>
+            <h2>Acceso a la Plataforma</h2>
+            <p class="auth-subtitulo">Inicia sesión como cliente o administrador, o registra una nueva cuenta</p>
 
             <div class="auth-tabs">
                 <button id="tab-login" class="tab-btn activo" type="button">Iniciar Sesión</button>
@@ -51,16 +60,16 @@
             <form id="form-login" class="auth-form" novalidate>
                 <div class="demo-box">
                     <p><strong>👥 Acceso Rápido — Cuentas Demo:</strong></p>
-                    <p>Contraseña demo: <code>Demo12345</code></p>
+                    <p>Clave inicial: <code>Demo12345</code></p>
                     <div class="demo-botones">
-                        <button type="button" id="btn-autofill-jesus" class="btn-demo">Jesús Contreras</button>
-                        <button type="button" id="btn-autofill-lysney" class="btn-demo btn-demo-alt">Lysney Simancas</button>
+                        <button type="button" id="btn-autofill-lysney" class="btn-demo btn-demo-alt">👑 Lysney Simancas (Admin)</button>
+                        <button type="button" id="btn-autofill-jesus" class="btn-demo">👤 Jesús Contreras (Cliente)</button>
                     </div>
                 </div>
 
                 <div class="form-grupo">
                     <label for="login-email">Correo Electrónico:</label>
-                    <input type="email" id="login-email" placeholder="Ej. jdcontrerast@gmail.com">
+                    <input type="email" id="login-email" placeholder="Ej. lysney.simancas@correo.com">
                     <small class="error" id="error-login-email"></small>
                 </div>
                 <div class="form-grupo">
@@ -69,6 +78,7 @@
                     <small class="error" id="error-login-password"></small>
                 </div>
                 <button type="submit" class="btn-primary">Ingresar a la Tienda</button>
+                <button type="button" id="btn-olvido-clave" class="btn-link">¿Olvidaste tu contraseña?</button>
             </form>
 
             <!-- Formulario de Registro con validación JS y expresiones regulares -->
@@ -80,7 +90,7 @@
                 </div>
                 <div class="form-grupo">
                     <label for="reg-telefono">Teléfono / Celular (10 dígitos):</label>
-                    <input type="tel" id="reg-telefono" placeholder="Ej. 3028348399">
+                    <input type="tel" id="reg-telefono" placeholder="Ej. 3015557890">
                     <small class="error" id="error-reg-telefono"></small>
                 </div>
                 <div class="form-grupo">
@@ -110,6 +120,7 @@
         </div>
     </section>
 
+    <!-- VISTA 1: TIENDA Y CARRITO DE COMPRAS -->
     <main id="seccion-tienda" class="oculto">
         <div class="columna-principal">
             <section class="productos">
@@ -221,11 +232,142 @@
         </aside>
     </main>
 
+    <!-- VISTA 2: PANEL DE ADMINISTRACIÓN DE USUARIOS (SOLO ROL ADMIN) -->
+    <section id="seccion-admin" class="admin-wrapper oculto">
+        <div class="admin-header-bar">
+            <div>
+                <h2>🛠️ Panel de Administración de Usuarios</h2>
+                <p class="admin-subtitulo">Gestiona los datos personales, roles y recuperación de contraseñas de las cuentas registradas</p>
+            </div>
+            <button id="btn-volver-tienda" class="btn-volver-tienda" type="button">← Volver a la Tienda</button>
+        </div>
+
+        <div class="admin-kpis">
+            <div class="kpi-card">
+                <span class="kpi-numero" id="kpi-total-usuarios">0</span>
+                <span class="kpi-label">Usuarios Registrados</span>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-numero" id="kpi-total-admins">0</span>
+                <span class="kpi-label">Administradores</span>
+            </div>
+            <div class="kpi-card">
+                <span class="kpi-numero" id="kpi-total-pedidos">0</span>
+                <span class="kpi-label">Pedidos en el Sistema</span>
+            </div>
+        </div>
+
+        <div class="admin-grid">
+            <div class="admin-lista-box">
+                <div class="catalogo-encabezado">
+                    <h3>Directorio de Cuentas</h3>
+                    <span id="contador-usuarios-admin" class="contador-resultados"></span>
+                </div>
+
+                <input
+                    type="search"
+                    id="input-buscar-usuario"
+                    class="input-buscar"
+                    placeholder="🔍 Buscar usuario por nombre, correo o teléfono..."
+                >
+
+                <p id="admin-lista-mensaje" class="admin-feedback"></p>
+
+                <div id="lista-usuarios-admin" class="lista-usuarios-admin"></div>
+            </div>
+
+            <aside class="admin-accion-box">
+                <div id="admin-panel-vacio" class="admin-panel-vacio">
+                    <span class="admin-icono-guia">⚙️</span>
+                    <h3>Gestión de Cuenta</h3>
+                    <p>Selecciona <strong>Editar Datos</strong> para actualizar la información o el rol de un usuario, o <strong>Cambiar Clave</strong> si olvidó su contraseña.</p>
+                </div>
+
+                <!-- Formulario para editar datos personales y rol del usuario -->
+                <div id="card-admin-editar" class="oculto">
+                    <h3>✏️ Editar Datos del Usuario</h3>
+                    <form id="form-admin-editar" class="auth-form" novalidate>
+                        <input type="hidden" id="admin-edit-id">
+
+                        <div class="form-grupo">
+                            <label for="admin-edit-nombre">Nombre Completo:</label>
+                            <input type="text" id="admin-edit-nombre">
+                            <small class="error" id="error-admin-edit-nombre"></small>
+                        </div>
+
+                        <div class="form-grupo">
+                            <label for="admin-edit-telefono">Teléfono / Celular (10 dígitos):</label>
+                            <input type="tel" id="admin-edit-telefono">
+                            <small class="error" id="error-admin-edit-telefono"></small>
+                        </div>
+
+                        <div class="form-grupo">
+                            <label for="admin-edit-direccion">Dirección de Envío:</label>
+                            <input type="text" id="admin-edit-direccion">
+                            <small class="error" id="error-admin-edit-direccion"></small>
+                        </div>
+
+                        <div class="form-grupo">
+                            <label for="admin-edit-email">Correo Electrónico:</label>
+                            <input type="email" id="admin-edit-email">
+                            <small class="error" id="error-admin-edit-email"></small>
+                        </div>
+
+                        <div class="form-grupo">
+                            <label for="admin-edit-rol">Rol en la Plataforma:</label>
+                            <select id="admin-edit-rol" class="select-input">
+                                <option value="cliente">👤 Cliente</option>
+                                <option value="admin">👑 Administrador</option>
+                            </select>
+                        </div>
+
+                        <div class="admin-form-botones">
+                            <button type="submit" class="btn-primary">Guardar Cambios</button>
+                            <button type="button" id="btn-cancelar-editar" class="btn-secundario">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Formulario para restablecer/cambiar contraseña en caso de olvido -->
+                <div id="card-admin-password" class="oculto">
+                    <h3>🔑 Restablecer Contraseña</h3>
+                    <p id="admin-pass-usuario-info" class="admin-pass-info"></p>
+
+                    <form id="form-admin-password" class="auth-form" novalidate>
+                        <input type="hidden" id="admin-pass-id">
+
+                        <div class="form-grupo">
+                            <label for="admin-nueva-password">Nueva Contraseña (mín. 8 caracteres):</label>
+                            <input type="password" id="admin-nueva-password" placeholder="Escribe la nueva contraseña">
+                            <small class="error" id="error-admin-nueva-password"></small>
+                        </div>
+
+                        <div class="form-grupo">
+                            <label for="admin-confirmar-password">Confirmar Nueva Contraseña:</label>
+                            <input type="password" id="admin-confirmar-password" placeholder="Confirma la nueva contraseña">
+                            <small class="error" id="error-admin-confirmar-password"></small>
+                        </div>
+
+                        <label class="check-mostrar-clave">
+                            <input type="checkbox" id="check-ver-clave-admin">
+                            Mostrar contraseñas escritas
+                        </label>
+
+                        <div class="admin-form-botones">
+                            <button type="submit" class="btn-primary">Actualizar Contraseña</button>
+                            <button type="button" id="btn-cancelar-password" class="btn-secundario">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </aside>
+        </div>
+    </section>
+
     <footer>
         <p><strong>PRAI 3: Actividad Final</strong> — Desarrollo Web II (IC05)</p>
-        <p>Desarrollado por <strong>Jesús Contreras</strong> y <strong>Lysney Simancas Segovia</strong></p>
+        <p>Desarrollado por <strong>Lysney Simancas Segovia</strong> y <strong>Jesús Contreras</strong></p>
     </footer>
 
-    <script src="js/app.js?v=5"></script>
+    <script src="js/app.js?v=6"></script>
 </body>
 </html>
